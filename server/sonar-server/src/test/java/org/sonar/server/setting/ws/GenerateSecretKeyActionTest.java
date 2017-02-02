@@ -33,6 +33,7 @@ import org.sonar.api.config.MapSettings;
 import org.sonar.api.config.Settings;
 import org.sonar.api.server.ws.WebService;
 import org.sonar.server.exceptions.ForbiddenException;
+import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.ws.TestRequest;
 import org.sonar.server.ws.WsActionTester;
@@ -40,23 +41,19 @@ import org.sonarqube.ws.MediaTypes;
 import org.sonarqube.ws.Settings.GenerateSecretKeyWsResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.sonar.core.permission.GlobalPermissions.QUALITY_PROFILE_ADMIN;
-import static org.sonar.core.permission.GlobalPermissions.SYSTEM_ADMIN;
 
 public class GenerateSecretKeyActionTest {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
   @Rule
-  public UserSessionRule userSession = UserSessionRule.standalone().setGlobalPermissions(SYSTEM_ADMIN);
+  public UserSessionRule userSession = UserSessionRule.standalone().login().setRoot();
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  Settings settings = new MapSettings();
-  Encryption encryption = settings.getEncryption();
-
-  GenerateSecretKeyAction underTest = new GenerateSecretKeyAction(settings, userSession);
-
-  WsActionTester ws = new WsActionTester(underTest);
+  private Settings settings = new MapSettings();
+  private Encryption encryption = settings.getEncryption();
+  private GenerateSecretKeyAction underTest = new GenerateSecretKeyAction(settings, userSession);
+  private WsActionTester ws = new WsActionTester(underTest);
 
   @Test
   public void generate_valid_secret_key() throws IOException {
@@ -83,13 +80,25 @@ public class GenerateSecretKeyActionTest {
   }
 
   @Test
-  public void fail_if_insufficient_permissions() {
-    expectedException.expect(ForbiddenException.class);
+  public void throw_UnauthorizedException_if_not_logged_in() {
+    userSession.anonymous();
 
-    userSession.anonymous().setGlobalPermissions(QUALITY_PROFILE_ADMIN);
+    expectedException.expect(UnauthorizedException.class);
+    expectedException.expectMessage("Authentication is required");
 
     call();
   }
+
+  @Test
+  public void throw_ForbiddenException_if_not_root() {
+    userSession.login();
+
+    expectedException.expect(ForbiddenException.class);
+    expectedException.expectMessage("Insufficient privileges");
+
+    call();
+  }
+
 
   private GenerateSecretKeyWsResponse call() {
     TestRequest request = ws.newRequest()
