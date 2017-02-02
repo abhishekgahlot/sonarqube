@@ -20,7 +20,6 @@
 package org.sonar.server.usertoken.ws;
 
 import javax.annotation.Nullable;
-import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.server.user.UserSession;
 
 import static org.sonar.server.user.AbstractUserSession.insufficientPrivilegesException;
@@ -31,11 +30,8 @@ class TokenPermissionsValidator {
   }
 
   static void validate(UserSession userSession, @Nullable String requestLogin) {
-    if (userSession.hasPermission(GlobalPermissions.SYSTEM_ADMIN)
-      || (requestLogin != null && requestLogin.equals(userSession.getLogin()))) {
-      return;
+    if (!userSession.isRoot() && !(requestLogin != null && requestLogin.equals(userSession.getLogin()))) {
+      throw insufficientPrivilegesException();
     }
-
-    throw insufficientPrivilegesException();
   }
 }

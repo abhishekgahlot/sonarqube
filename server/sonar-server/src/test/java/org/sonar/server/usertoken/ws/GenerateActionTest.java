@@ -27,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sonar.api.utils.System2;
-import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.db.DbTester;
 import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.ForbiddenException;
@@ -70,9 +69,6 @@ public class GenerateActionTest {
   public void setUp() {
     when(tokenGenerator.generate()).thenReturn("123456789");
     when(tokenGenerator.hash(anyString())).thenReturn("987654321");
-    userSession
-      .logIn()
-      .setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
     db.users().insertUser(newUserDto().setLogin(GRACE_HOPPER));
     db.users().insertUser(newUserDto().setLogin(ADA_LOVELACE));
 
@@ -82,6 +78,8 @@ public class GenerateActionTest {
 
   @Test
   public void json_example() {
+    userSession.logIn().setRoot();
+
     String response = ws.newRequest()
       .setMediaType(MediaTypes.JSON)
       .setParam(PARAM_LOGIN, GRACE_HOPPER)
@@ -93,7 +91,7 @@ public class GenerateActionTest {
 
   @Test
   public void a_user_can_generate_token_for_himself() {
-    userSession.logIn(GRACE_HOPPER).setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+    userSession.logIn(GRACE_HOPPER);
 
     GenerateWsResponse response = newRequest(null, TOKEN_NAME);
 
@@ -102,6 +100,8 @@ public class GenerateActionTest {
 
   @Test
   public void fail_if_name_is_longer_than_100_characters() {
+    userSession.logIn().setRoot();
+
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage("Token name length (101) is longer than the maximum authorized (100)");
 
@@ -110,6 +110,8 @@ public class GenerateActionTest {
 
   @Test
   public void fail_if_login_does_not_exist() {
+    userSession.logIn().setRoot();
+
     expectedException.expect(ForbiddenException.class);
 
     newRequest("unknown-login", "any-name");
@@ -117,6 +119,8 @@ public class GenerateActionTest {
 
   @Test
   public void fail_if_name_is_blank() {
+    userSession.logIn().setRoot();
+
     expectedException.expect(BadRequestException.class);
     expectedException.expectMessage("The 'name' parameter must not be blank");
 
@@ -125,6 +129,8 @@ public class GenerateActionTest {
 
   @Test
   public void fail_if_token_with_same_login_and_name_exists() {
+    userSession.logIn().setRoot();
+
     newRequest(GRACE_HOPPER, TOKEN_NAME);
     expectedException.expect(BadRequestException.class);
     expectedException.expectMessage("A user token with login 'grace.hopper' and name 'Third Party Application' already exists");
@@ -134,6 +140,8 @@ public class GenerateActionTest {
 
   @Test
   public void fail_if_token_hash_already_exists_in_db() {
+    userSession.logIn().setRoot();
+
     when(tokenGenerator.hash(anyString())).thenReturn("987654321");
     db.getDbClient().userTokenDao().insert(db.getSession(), newUserToken().setTokenHash("987654321"));
     db.commit();
@@ -145,7 +153,7 @@ public class GenerateActionTest {
 
   @Test
   public void fail_if_insufficient_privileges() {
-    userSession.logIn(ADA_LOVELACE).setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+    userSession.logIn().setNonRoot();
     expectedException.expect(ForbiddenException.class);
 
     newRequest(GRACE_HOPPER, TOKEN_NAME);

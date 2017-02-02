@@ -27,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sonar.api.utils.System2;
-import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.db.DbClient;
 import org.sonar.db.DbSession;
 import org.sonar.db.DbTester;
@@ -62,13 +61,14 @@ public class SearchActionTest {
 
   @Before
   public void setUp() {
-    userSession.logIn().setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
     db.users().insertUser(newUserDto().setLogin(GRACE_HOPPER));
     db.users().insertUser(newUserDto().setLogin(ADA_LOVELACE));
   }
 
   @Test
   public void search_json_example() {
+    userSession.logIn().setRoot();
+
     dbClient.userTokenDao().insert(dbSession, newUserToken()
       .setCreatedAt(1448523067221L)
       .setName("Project scan on Travis")
@@ -96,7 +96,7 @@ public class SearchActionTest {
 
   @Test
   public void a_user_can_search_its_own_token() {
-    userSession.logIn(GRACE_HOPPER).setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+    userSession.logIn(GRACE_HOPPER);
     dbClient.userTokenDao().insert(dbSession, newUserToken()
       .setCreatedAt(1448523067221L)
       .setName("Project scan on Travis")
@@ -110,6 +110,8 @@ public class SearchActionTest {
 
   @Test
   public void fail_when_login_does_not_exist() {
+    userSession.logIn().setRoot();
+
     expectedException.expect(NotFoundException.class);
     expectedException.expectMessage("User with login 'unknown-login' not found");
 
@@ -118,7 +120,7 @@ public class SearchActionTest {
 
   @Test
   public void fail_when_insufficient_privileges() {
-    userSession.logIn().setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+    userSession.logIn();
     expectedException.expect(ForbiddenException.class);
 
     newRequest(GRACE_HOPPER);

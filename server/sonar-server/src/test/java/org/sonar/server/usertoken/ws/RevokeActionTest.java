@@ -42,33 +42,30 @@ import static org.sonarqube.ws.client.usertoken.UserTokensWsParameters.PARAM_NAM
 
 
 public class RevokeActionTest {
-  static final String GRACE_HOPPER = "grace.hopper";
-  static final String ADA_LOVELACE = "ada.lovelace";
-  static final String TOKEN_NAME = "token-name";
+  private static final String GRACE_HOPPER = "grace.hopper";
+  private static final String ADA_LOVELACE = "ada.lovelace";
+  private static final String TOKEN_NAME = "token-name";
 
   @Rule
   public DbTester db = DbTester.create(System2.INSTANCE);
-  DbClient dbClient = db.getDbClient();
-  final DbSession dbSession = db.getSession();
   @Rule
   public UserSessionRule userSession = UserSessionRule.standalone();
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  WsActionTester ws;
+  private DbClient dbClient = db.getDbClient();
+  private final DbSession dbSession = db.getSession();
+  private WsActionTester ws;
 
   @Before
   public void setUp() {
-    userSession
-      .logIn()
-      .setGlobalPermissions(GlobalPermissions.SYSTEM_ADMIN);
-
     ws = new WsActionTester(
       new RevokeAction(dbClient, userSession));
   }
 
   @Test
   public void delete_token_in_db() {
+    userSession.logIn().setRoot();
     insertUserToken(newUserToken().setLogin(GRACE_HOPPER).setName("token-to-delete"));
     insertUserToken(newUserToken().setLogin(GRACE_HOPPER).setName("token-to-keep-1"));
     insertUserToken(newUserToken().setLogin(GRACE_HOPPER).setName("token-to-keep-2"));
@@ -94,6 +91,7 @@ public class RevokeActionTest {
 
   @Test
   public void does_not_fail_when_incorrect_login_or_name() {
+    userSession.logIn().setRoot();
     insertUserToken(newUserToken().setLogin(GRACE_HOPPER).setName(TOKEN_NAME));
 
     newRequest(ADA_LOVELACE, "another-token-name");
