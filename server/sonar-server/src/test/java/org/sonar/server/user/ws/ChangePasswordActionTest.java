@@ -91,7 +91,8 @@ public class ChangePasswordActionTest {
   }
 
   @Test
-  public void update_password() throws Exception {
+  public void root_can_update_password_of_user() throws Exception {
+    userSessionRule.logIn().setRoot();
     createUser();
     String originalPassword = db.getDbClient().userDao().selectOrFailByLogin(db.getSession(), "john").getCryptedPassword();
 
@@ -106,7 +107,7 @@ public class ChangePasswordActionTest {
   }
 
   @Test
-  public void update_password_on_self() throws Exception {
+  public void a_user_can_update_his_password() throws Exception {
     createUser();
     String originalPassword = db.getDbClient().userDao().selectOrFailByLogin(db.getSession(), "john").getCryptedPassword();
 
@@ -149,6 +150,8 @@ public class ChangePasswordActionTest {
 
   @Test
   public void fail_to_update_password_on_external_auth() throws Exception {
+    userSessionRule.logIn().setRoot();
+
     userUpdater.create(NewUser.builder()
       .setEmail("john@email.com")
       .setLogin("john")
