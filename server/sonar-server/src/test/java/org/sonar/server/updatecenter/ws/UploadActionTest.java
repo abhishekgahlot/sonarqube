@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.sonar.server.exceptions.ForbiddenException;
+import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.platform.ServerFileSystem;
 import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.ws.TestResponse;
@@ -38,13 +39,11 @@ import static java.nio.file.Files.newInputStream;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.sonar.core.permission.GlobalPermissions.PROVISIONING;
-import static org.sonar.core.permission.GlobalPermissions.SYSTEM_ADMIN;
 import static org.sonar.test.ExceptionCauseMatcher.hasType;
 
 public class UploadActionTest {
 
-  static final String PLUGIN_NAME = "plugin.jar";
+  private static final String PLUGIN_NAME = "plugin.jar";
 
   @Rule
   public TemporaryFolder folder = new TemporaryFolder();
@@ -55,11 +54,10 @@ public class UploadActionTest {
   @Rule
   public UserSessionRule userSession = UserSessionRule.standalone();
 
-  ServerFileSystem fileSystem = mock(ServerFileSystem.class);
-  File pluginDirectory;
-
-  File plugin = new File(getClass().getResource("UploadActionTest/plugin.jar").getFile());
-  WsActionTester wsTester;
+  private ServerFileSystem fileSystem = mock(ServerFileSystem.class);
+  private File pluginDirectory;
+  private File plugin = new File(getClass().getResource("UploadActionTest/plugin.jar").getFile());
+  private WsActionTester wsTester;
 
   @Before
   public void setUp() throws Exception {
@@ -70,7 +68,7 @@ public class UploadActionTest {
 
   @Test
   public void upload_plugin() throws Exception {
-    setSystemAdminUser();
+    logInAsRoot();
 
     TestResponse response = call(newInputStream(plugin.toPath()), PLUGIN_NAME);
 
@@ -80,7 +78,7 @@ public class UploadActionTest {
 
   @Test
   public void erase_existing_plugin_if_already_exists() throws Exception {
-    setSystemAdminUser();
+    logInAsRoot();
 
     File plugin1 = new File(getClass().getResource("UploadActionTest/plugin.jar").getFile());
     call(newInputStream(plugin1.toPath()), PLUGIN_NAME);
@@ -95,7 +93,7 @@ public class UploadActionTest {
 
   @Test
   public void fail_when_plugin_extension_is_not_jar() throws Exception {
-    setSystemAdminUser();
+    logInAsRoot();
 
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage("Only jar file is allowed");
@@ -104,7 +102,7 @@ public class UploadActionTest {
 
   @Test
   public void fail_when_no_files_param() throws Exception {
-    setSystemAdminUser();
+    logInAsRoot();
 
     expectedException.expect(IllegalArgumentException.class);
     expectedException.expectMessage("The 'file' parameter is missing");
@@ -113,7 +111,7 @@ public class UploadActionTest {
 
   @Test
   public void input_stream_should_be_closed() throws Exception {
-    setSystemAdminUser();
+    logInAsRoot();
 
     InputStream inputStream = newInputStream(plugin.toPath());
     call(inputStream, PLUGIN_NAME);
@@ -124,10 +122,22 @@ public class UploadActionTest {
   }
 
   @Test
-  public void fail_if_not_system_admin() throws Exception {
-    userSession.logIn().setGlobalPermissions(PROVISIONING);
+  public void throw_UnauthorizedException_if_not_logged_in() throws Exception {
+    userSession.anonymous();
+
+    expectedException.expect(UnauthorizedException.class);
+    expectedException.expectMessage("Authentication is required");
+
+    call(newInputStream(plugin.toPath()), PLUGIN_NAME);
+  }
+
+  @Test
+  public void throw_ForbiddenException_if_not_root() throws Exception {
+    userSession.logIn();
 
     expectedException.expect(ForbiddenException.class);
+    expectedException.expectMessage("Insufficient privileges");
+
     call(newInputStream(plugin.toPath()), PLUGIN_NAME);
   }
 
@@ -137,8 +147,8 @@ public class UploadActionTest {
       .execute();
   }
 
-  private void setSystemAdminUser() {
-    userSession.logIn().setGlobalPermissions(SYSTEM_ADMIN);
+  private void logInAsRoot() {
+    userSession.logIn().setRoot();
   }
 
   private void assertPluginIsUploaded(String pluginName) {
