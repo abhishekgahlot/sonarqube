@@ -73,7 +73,7 @@ public class SetActionTest {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
   @Rule
-  public UserSessionRule userSession = UserSessionRule.standalone().login().setRoot();
+  public UserSessionRule userSession = UserSessionRule.standalone().logIn().setRoot();
 
   @Rule
   public DbTester db = DbTester.create(System2.INSTANCE);
@@ -136,7 +136,7 @@ public class SetActionTest {
   @Test
   public void persist_project_property_with_project_admin_permission() {
     ComponentDto project = db.components().insertProject();
-    userSession.login().addProjectUuidPermissions(UserRole.ADMIN, project.uuid());
+    userSession.logIn().addProjectUuidPermissions(UserRole.ADMIN, project.uuid());
 
     callForProjectSettingByKey("my.key", "my value", project.key());
 
@@ -326,7 +326,7 @@ public class SetActionTest {
   }
 
   @Test
-  public void persist_multi_value_with_type_login() {
+  public void persist_multi_value_with_type_logIn() {
     definitions.addComponent(PropertyDefinition
       .builder("my.key")
       .name("foo")
@@ -434,7 +434,7 @@ public class SetActionTest {
 
   @Test
   public void throw_ForbiddenException_if_not_root() {
-    userSession.login();
+    userSession.logIn();
 
     expectedException.expect(ForbiddenException.class);
     expectedException.expectMessage("Insufficient privileges");
@@ -483,7 +483,7 @@ public class SetActionTest {
   }
 
   @Test
-  public void fail_when_data_and_login_type_with_invalid_login() {
+  public void fail_when_data_and_login_type_with_invalid_logIn() {
     definitions.addComponent(PropertyDefinition
       .builder("my.key")
       .name("foo")

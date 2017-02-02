@@ -120,7 +120,7 @@ public class GenerateActionTest {
 
   @Test
   public void throw_ForbiddenException_if_not_root() {
-    userSession.login().setNonRoot();
+    userSession.logIn().setNonRoot();
 
     expectedException.expect(ForbiddenException.class);
 
@@ -201,6 +201,6 @@ public class GenerateActionTest {
   }
 
   private void logInAsRoot() {
-    userSession.login().setRoot();
+    userSession.logIn().setRoot();
   }
 }

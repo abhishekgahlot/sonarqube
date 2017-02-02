@@ -59,7 +59,7 @@ public class ActivityStatusActionTest {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
   @Rule
-  public UserSessionRule userSession = UserSessionRule.standalone().login().setRoot();
+  public UserSessionRule userSession = UserSessionRule.standalone().logIn().setRoot();
   @Rule
   public DbTester db = DbTester.create(System2.INSTANCE);
 
@@ -154,7 +154,7 @@ public class ActivityStatusActionTest {
 
   @Test
   public void throw_ForbiddenException_if_not_root() {
-    userSession.login();
+    userSession.logIn();
 
     expectedException.expect(ForbiddenException.class);
     expectedException.expectMessage("Insufficient privileges");
@@ -164,7 +164,7 @@ public class ActivityStatusActionTest {
 
   @Test
   public void throw_ForbiddenException_if_not_administrator_of_requested_project() {
-    userSession.login();
+    userSession.logIn();
     ComponentDto project = db.components().insertProject();
 
     expectedException.expect(ForbiddenException.class);

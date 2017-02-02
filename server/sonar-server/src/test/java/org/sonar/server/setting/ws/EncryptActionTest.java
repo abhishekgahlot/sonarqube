@@ -101,7 +101,7 @@ public class EncryptActionTest {
 
   @Test
   public void throw_ForbiddenException_if_not_root() throws Exception {
-    userSession.login().setNonRoot();
+    userSession.logIn().setNonRoot();
 
     expectedException.expect(ForbiddenException.class);
     expectedException.expectMessage("Insufficient privileges");
@@ -167,6 +167,6 @@ public class EncryptActionTest {
   }
 
   private void logInAsRoot() {
-    userSession.login().setRoot();
+    userSession.logIn().setRoot();
   }
 }

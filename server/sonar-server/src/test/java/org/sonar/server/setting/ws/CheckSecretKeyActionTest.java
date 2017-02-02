@@ -104,7 +104,7 @@ public class CheckSecretKeyActionTest {
 
   @Test
   public void throw_ForbiddenException_if_not_root() {
-    userSession.login();
+    userSession.logIn();
 
     expectedException.expect(ForbiddenException.class);
     expectedException.expectMessage("Insufficient privileges");
@@ -125,6 +125,6 @@ public class CheckSecretKeyActionTest {
   }
 
   private void logInAsRoot() {
-    userSession.login().setRoot();
+    userSession.logIn().setRoot();
   }
 }
