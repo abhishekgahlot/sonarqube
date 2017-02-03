@@ -19,22 +19,19 @@
  */
 package org.sonar.scanner.rule;
 
-import org.sonar.api.rule.RuleKey;
-import org.sonar.scanner.WsTestUtil;
-import org.sonar.scanner.bootstrap.ScannerWsClient;
-import org.sonar.scanner.rule.DefaultActiveRulesLoader;
-import org.sonar.scanner.rule.LoadedActiveRule;
 import com.google.common.io.Resources;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import org.junit.Before;
+import org.junit.Test;
+import org.sonar.api.rule.RuleKey;
+import org.sonar.scanner.WsTestUtil;
+import org.sonar.scanner.bootstrap.ScannerWsClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import org.junit.Before;
 
 public class DefaultActiveRulesLoaderTest {
   private DefaultActiveRulesLoader loader;
@@ -51,8 +48,8 @@ public class DefaultActiveRulesLoaderTest {
     InputStream response1 = loadResource("active_rule_search1.protobuf");
     InputStream response2 = loadResource("active_rule_search2.protobuf");
 
-    String req1 = "/api/rules/search.protobuf?f=repo,name,severity,lang,internalKey,templateKey,params,actives&activation=true&qprofile=c%2B-test_c%2B-values-17445&p=1&ps=500";
-    String req2 = "/api/rules/search.protobuf?f=repo,name,severity,lang,internalKey,templateKey,params,actives&activation=true&qprofile=c%2B-test_c%2B-values-17445&p=2&ps=500";
+    String req1 = "/api/rules/search.protobuf?f=repo,name,severity,lang,internalKey,templateKey,params,actives,createdAt&activation=true&qprofile=c%2B-test_c%2B-values-17445&p=1&ps=500";
+    String req2 = "/api/rules/search.protobuf?f=repo,name,severity,lang,internalKey,templateKey,params,actives,createdAt&activation=true&qprofile=c%2B-test_c%2B-values-17445&p=2&ps=500";
     WsTestUtil.mockStream(wsClient, req1, response1);
     WsTestUtil.mockStream(wsClient, req2, response2);
 
