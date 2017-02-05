@@ -24,29 +24,33 @@ import javax.annotation.Nullable;
 import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.Response;
 import org.sonar.api.server.ws.WebService;
+import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.db.DbClient;
 import org.sonar.db.DbSession;
-import org.sonar.db.MyBatis;
 import org.sonar.db.component.ComponentDto;
+import org.sonar.db.organization.OrganizationDto;
 import org.sonar.server.component.ComponentCleanerService;
 import org.sonar.server.user.UserSession;
 
 import static org.sonar.server.ws.KeyExamples.KEY_PROJECT_EXAMPLE_001;
 
 public class BulkDeleteAction implements ProjectsWsAction {
-  private static final String ACTION = "bulk_delete";
 
-  public static final String PARAM_IDS = "ids";
-  public static final String PARAM_KEYS = "keys";
+  private static final String ACTION = "bulk_delete";
+  private static final String PARAM_IDS = "ids";
+  private static final String PARAM_KEYS = "keys";
 
   private final ComponentCleanerService componentCleanerService;
   private final DbClient dbClient;
   private final UserSession userSession;
+  private final ProjectsWsSupport support;
 
-  public BulkDeleteAction(ComponentCleanerService componentCleanerService, DbClient dbClient, UserSession userSession) {
+  public BulkDeleteAction(ComponentCleanerService componentCleanerService, DbClient dbClient, UserSession userSession,
+    ProjectsWsSupport support) {
     this.componentCleanerService = componentCleanerService;
     this.dbClient = dbClient;
     this.userSession = userSession;
+    this.support = support;
   }
 
   @Override
@@ -67,20 +71,31 @@ public class BulkDeleteAction implements ProjectsWsAction {
       .createParam(PARAM_KEYS)
       .setDescription("List of project keys to delete")
       .setExampleValue(KEY_PROJECT_EXAMPLE_001);
+
+    support.addOrganizationParam(action);
   }
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    userSession.checkLoggedIn().checkIsRoot();
+    userSession.checkLoggedIn();
+
     List<String> uuids = request.paramAsStrings(PARAM_IDS);
     List<String> keys = request.paramAsStrings(PARAM_KEYS);
+    String orgKey = request.param(ProjectsWsSupport.PARAM_ORGANIZATION);
 
-    DbSession dbSession = dbClient.openSession(false);
-    try {
+    try (DbSession dbSession = dbClient.openSession(false)) {
+      final OrganizationDto org;
+      if (orgKey == null) {
+        userSession.checkIsRoot();
+        org = null;
+      } else {
+        org = support.getOrganization(dbSession, orgKey);
+        userSession.checkOrganizationPermission(org.getUuid(), GlobalPermissions.SYSTEM_ADMIN);
+      }
       List<ComponentDto> projects = searchProjects(dbSession, uuids, keys);
-      componentCleanerService.delete(dbSession, projects);
-    } finally {
-      MyBatis.closeQuietly(dbSession);
+      projects.stream()
+        .filter(p -> org == null || p.getOrganizationUuid().equals(org.getUuid()))
+        .forEach(p -> componentCleanerService.delete(dbSession, p));
     }
 
     response.noContent();
