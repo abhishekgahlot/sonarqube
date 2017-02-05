@@ -104,6 +104,8 @@ public class CreateEventAction implements ProjectAnalysesWsAction {
 
   @Override
   public void handle(Request httpRequest, Response httpResponse) throws Exception {
+    userSession.checkLoggedIn();
+
     CreateEventRequest request = toAddEventRequest(httpRequest);
     CreateEventResponse response = doHandle(request);
 
