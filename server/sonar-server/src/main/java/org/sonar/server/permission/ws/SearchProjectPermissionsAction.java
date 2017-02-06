@@ -130,7 +130,7 @@ public class SearchProjectPermissionsAction implements PermissionsWsAction {
     } else {
       projectId = Optional.empty();
     }
-    PermissionPrivilegeChecker.checkProjectAdmin2(userSession, projectId);
+    PermissionPrivilegeChecker.checkProjectAdmin(userSession, projectId);
   }
 
   private SearchProjectPermissionsWsResponse buildResponse(SearchProjectPermissionsData data) {

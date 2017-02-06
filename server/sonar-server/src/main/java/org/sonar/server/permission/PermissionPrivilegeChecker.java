@@ -55,7 +55,7 @@ public class PermissionPrivilegeChecker {
    * @deprecated does not support organizations. Replaced by {@link #checkProjectAdmin(UserSession, String, Optional)}
    */
   @Deprecated
-  public static void checkProjectAdmin2(UserSession userSession, Optional<ProjectId> projectId) {
+  public static void checkProjectAdmin(UserSession userSession, Optional<ProjectId> projectId) {
     userSession.checkLoggedIn();
     if (projectId.isPresent()) {
       userSession.checkComponentUuidPermission(UserRole.ADMIN, projectId.get().getUuid());
