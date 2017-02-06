@@ -48,7 +48,6 @@ import org.sonar.scanner.protocol.GsonHelper;
 import org.sonar.server.component.ComponentFinder;
 import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.ForbiddenException;
-import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.i18n.I18nRule;
 import org.sonar.server.platform.SettingsChangeNotifier;
 import org.sonar.server.tester.UserSessionRule;
@@ -420,16 +419,6 @@ public class SetActionTest {
 
     callForMultiValueGlobalSetting("my.key", newArrayList("oneValue", "  ", "anotherValue"));
 
-  }
-
-  @Test
-  public void throw_UnauthorizedException_if_not_logged_in() {
-    userSession.anonymous();
-
-    expectedException.expect(UnauthorizedException.class);
-    expectedException.expectMessage("Authentication is required");
-
-    callForGlobalSetting("my.key", "my value");
   }
 
   @Test

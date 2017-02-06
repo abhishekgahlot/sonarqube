@@ -129,8 +129,6 @@ public class SetAction implements SettingsWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    userSession.checkLoggedIn();
-
     try (DbSession dbSession = dbClient.openSession(false)) {
       doHandle(dbSession, toWsRequest(request));
     }

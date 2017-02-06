@@ -89,8 +89,6 @@ public class ResetAction implements SettingsWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    userSession.checkLoggedIn();
-
     try (DbSession dbSession = dbClient.openSession(false)) {
       ResetRequest resetRequest = toWsRequest(request);
       Optional<ComponentDto> component = getComponent(dbSession, resetRequest);
