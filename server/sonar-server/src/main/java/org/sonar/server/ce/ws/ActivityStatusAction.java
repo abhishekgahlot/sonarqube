@@ -74,9 +74,6 @@ public class ActivityStatusAction implements CeWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    // fail-fast
-    userSession.checkLoggedIn();
-
     ActivityStatusWsResponse activityStatusResponse = doHandle(toWsRequest(request));
     writeProtobuf(activityStatusResponse, request, response);
   }

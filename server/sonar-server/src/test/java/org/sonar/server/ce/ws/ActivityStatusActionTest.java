@@ -40,7 +40,6 @@ import org.sonar.db.organization.OrganizationDto;
 import org.sonar.server.component.ComponentFinder;
 import org.sonar.server.exceptions.ForbiddenException;
 import org.sonar.server.exceptions.NotFoundException;
-import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.ws.TestRequest;
 import org.sonar.server.ws.WsActionTester;
@@ -140,16 +139,6 @@ public class ActivityStatusActionTest {
     expectedException.expect(NotFoundException.class);
 
     callByComponentKey("unknown-key");
-  }
-
-  @Test
-  public void throw_UnauthorizedException_if_not_logged_in() {
-    userSession.anonymous();
-
-    expectedException.expect(UnauthorizedException.class);
-    expectedException.expectMessage("Authentication is required");
-
-    call();
   }
 
   @Test
