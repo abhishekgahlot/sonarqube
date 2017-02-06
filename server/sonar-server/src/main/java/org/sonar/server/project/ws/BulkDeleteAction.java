@@ -20,6 +20,7 @@
 package org.sonar.server.project.ws;
 
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.Response;
@@ -84,21 +85,24 @@ public class BulkDeleteAction implements ProjectsWsAction {
     String orgKey = request.param(ProjectsWsSupport.PARAM_ORGANIZATION);
 
     try (DbSession dbSession = dbClient.openSession(false)) {
-      final OrganizationDto org;
-      if (orgKey == null) {
-        userSession.checkIsRoot();
-        org = null;
-      } else {
-        org = support.getOrganization(dbSession, orgKey);
-        userSession.checkOrganizationPermission(org.getUuid(), GlobalPermissions.SYSTEM_ADMIN);
-      }
+      Optional<OrganizationDto> org = loadOrganizationByKey(dbSession, orgKey);
       List<ComponentDto> projects = searchProjects(dbSession, uuids, keys);
       projects.stream()
-        .filter(p -> org == null || p.getOrganizationUuid().equals(org.getUuid()))
+        .filter(p -> !org.isPresent() || org.get().getUuid().equals(p.getOrganizationUuid()))
         .forEach(p -> componentCleanerService.delete(dbSession, p));
     }
 
     response.noContent();
+  }
+
+  private Optional<OrganizationDto> loadOrganizationByKey(DbSession dbSession, @Nullable String orgKey) {
+    if (orgKey == null) {
+      userSession.checkIsRoot();
+      return Optional.empty();
+    }
+    OrganizationDto org = support.getOrganization(dbSession, orgKey);
+    userSession.checkOrganizationPermission(org.getUuid(), GlobalPermissions.SYSTEM_ADMIN);
+    return Optional.of(org);
   }
 
   private List<ComponentDto> searchProjects(DbSession dbSession, @Nullable List<String> uuids, @Nullable List<String> keys) {
