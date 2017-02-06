@@ -72,7 +72,7 @@ public class BulkDeleteActionTest {
   }
 
   @Test
-  public void root_administrator_deletes_projects_by_uuids_in_all_organizations() throws Exception {
+  public void root_deletes_projects_by_uuids_in_all_organizations() throws Exception {
     userSession.logIn().setRoot();
     ComponentDto toDeleteInOrg1 = db.components().insertProject(org1);
     ComponentDto toDeleteInOrg2 = db.components().insertProject(org2);
@@ -87,7 +87,7 @@ public class BulkDeleteActionTest {
   }
 
   @Test
-  public void root_administrator_deletes_projects_by_keys_in_all_organizations() throws Exception {
+  public void root_deletes_projects_by_keys_in_all_organizations() throws Exception {
     userSession.logIn().setRoot();
     ComponentDto toDeleteInOrg1 = db.components().insertProject(org1);
     ComponentDto toDeleteInOrg2 = db.components().insertProject(org2);
@@ -157,7 +157,7 @@ public class BulkDeleteActionTest {
   }
 
   @Test
-  public void throw_ForbiddenException_if_param_organization_is_not_set_and_not_root_administrator() throws Exception {
+  public void throw_ForbiddenException_if_param_organization_is_not_set_and_not_root() throws Exception {
     userSession.logIn().setNonRoot();
 
     expectedException.expect(ForbiddenException.class);
