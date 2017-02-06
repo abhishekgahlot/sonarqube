@@ -162,15 +162,12 @@ public class UpdateAction implements RulesWsAction {
   public void handle(Request request, Response response) throws Exception {
     ruleWsSupport.checkQProfileAdminPermission();
 
-    DbSession dbSession = dbClient.openSession(false);
-    try {
+    try (DbSession dbSession = dbClient.openSession(false)) {
       RuleUpdate update = readRequest(dbSession, request);
       ruleUpdater.update(dbSession, update, userSession);
       UpdateResponse updateResponse = buildResponse(dbSession, update.getRuleKey());
 
       writeProtobuf(updateResponse, request, response);
-    } finally {
-      dbClient.closeSession(dbSession);
     }
   }
 
