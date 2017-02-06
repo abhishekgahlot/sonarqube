@@ -30,6 +30,7 @@ class TokenPermissionsValidator {
   }
 
   static void validate(UserSession userSession, @Nullable String requestLogin) {
+    userSession.checkLoggedIn();
     if (!userSession.isRoot() && !isLoggedInUser(userSession, requestLogin)) {
       throw insufficientPrivilegesException();
     }

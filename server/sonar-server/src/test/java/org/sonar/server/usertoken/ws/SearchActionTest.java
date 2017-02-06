@@ -32,6 +32,7 @@ import org.sonar.db.DbSession;
 import org.sonar.db.DbTester;
 import org.sonar.server.exceptions.ForbiddenException;
 import org.sonar.server.exceptions.NotFoundException;
+import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.ws.TestRequest;
 import org.sonar.server.ws.TestResponse;
@@ -119,9 +120,19 @@ public class SearchActionTest {
   }
 
   @Test
-  public void fail_when_insufficient_privileges() {
+  public void throw_ForbiddenException_if_a_non_root_administrator_searches_for_tokens_of_someone_else() {
     userSession.logIn();
+
     expectedException.expect(ForbiddenException.class);
+
+    newRequest(GRACE_HOPPER);
+  }
+
+  @Test
+  public void throw_UnauthorizedException_if_not_logged_in() {
+    userSession.anonymous();
+
+    expectedException.expect(UnauthorizedException.class);
 
     newRequest(GRACE_HOPPER);
   }

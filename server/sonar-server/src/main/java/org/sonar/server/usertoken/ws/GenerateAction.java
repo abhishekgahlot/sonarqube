@@ -85,8 +85,6 @@ public class GenerateAction implements UserTokensWsAction {
   }
 
   private WsUserTokens.GenerateWsResponse doHandle(GenerateWsRequest request) {
-    userSession.checkLoggedIn();
-
     try (DbSession dbSession = dbClient.openSession(false)) {
       checkWsRequest(dbSession, request);
       TokenPermissionsValidator.validate(userSession, request.getLogin());
