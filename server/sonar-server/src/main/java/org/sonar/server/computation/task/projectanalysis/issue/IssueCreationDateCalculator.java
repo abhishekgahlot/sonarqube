@@ -64,7 +64,7 @@ public class IssueCreationDateCalculator extends IssueVisitor {
 
   @Override
   public void onIssue(Component component, DefaultIssue issue) {
-    if (newFindingOnOldCode(issue)) {
+    if (issue.isNew() && ruleIsNew(issue)) {
 
       // get scm information of file, if available
       getChangeSet(component)
@@ -83,13 +83,6 @@ public class IssueCreationDateCalculator extends IssueVisitor {
         // use the change date as the creation date of the issue
         .ifPresent(scmDate -> updateDate(issue, scmDate));
     }
-  }
-
-  private boolean newFindingOnOldCode(DefaultIssue issue) {
-    boolean issueIsNew = issue.isNew();
-    boolean projectDateSpecified = analysisMetadataHolder.hasAnalysisDateBeenSet();
-
-    return issueIsNew && !projectDateSpecified && ruleIsNew(issue);
   }
 
   private boolean ruleIsNew(DefaultIssue issue) {
