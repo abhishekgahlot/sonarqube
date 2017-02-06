@@ -147,7 +147,7 @@ public class SetDefaultActionTest {
   private void logInAsQProfileAdministrator() {
     userSessionRule
       .logIn()
-      .addOrganizationPermission(defaultOrganizationProvider.get().getUuid(), GlobalPermissions.QUALITY_PROFILE_ADMIN);
+      .addOrganizationPermission(db.getDefaultOrganization().getUuid(), GlobalPermissions.QUALITY_PROFILE_ADMIN);
   }
 
   private void createProfiles() {
