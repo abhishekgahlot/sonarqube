@@ -36,7 +36,6 @@ import org.sonar.api.config.Settings;
 import org.sonar.api.server.ws.WebService;
 import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.ForbiddenException;
-import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.ws.TestRequest;
 import org.sonar.server.ws.WsActionTester;
@@ -105,16 +104,6 @@ public class EncryptActionTest {
 
     expectedException.expect(ForbiddenException.class);
     expectedException.expectMessage("Insufficient privileges");
-
-    call("my value");
-  }
-
-  @Test
-  public void throw_UnauthorizedException_if_not_logged_in() throws Exception {
-    userSession.anonymous();
-
-    expectedException.expect(UnauthorizedException.class);
-    expectedException.expectMessage("Authentication is required");
 
     call("my value");
   }
