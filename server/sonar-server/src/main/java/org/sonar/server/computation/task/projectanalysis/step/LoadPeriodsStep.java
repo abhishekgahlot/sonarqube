@@ -89,7 +89,7 @@ public class LoadPeriodsStep implements ComputationStep {
   public void execute(Component projectOrView) {
     DbSession session = dbClient.openSession(false);
     try {
-      periodsHolder.setPeriods(buildPeriods(projectOrView, session));
+      periodsHolder.setPeriod(buildPeriods(projectOrView, session));
     } finally {
       dbClient.closeSession(session);
     }

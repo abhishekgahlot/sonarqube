@@ -28,7 +28,7 @@ import org.sonar.api.measures.CoreMetrics;
 import org.sonar.server.computation.task.projectanalysis.component.PathAwareCrawler;
 import org.sonar.server.computation.task.projectanalysis.component.TreeRootHolderRule;
 import org.sonar.server.computation.task.projectanalysis.component.ViewsComponent;
-import org.sonar.server.computation.task.projectanalysis.formula.counter.IntVariationValue;
+import org.sonar.server.computation.task.projectanalysis.formula.counter.IntCounter;
 import org.sonar.server.computation.task.projectanalysis.measure.Measure;
 import org.sonar.server.computation.task.projectanalysis.measure.MeasureRepoEntry;
 import org.sonar.server.computation.task.projectanalysis.measure.MeasureRepositoryRule;
@@ -91,7 +91,7 @@ public class ViewsFormulaExecutorComponentVisitorTest {
   public MeasureRepositoryRule measureRepository = MeasureRepositoryRule.create(treeRootHolder, metricRepository);
   @Rule
   public PeriodsHolderRule periodsHolder = new PeriodsHolderRule()
-    .setPeriods(new Period(2, "some mode", null, 95l, "u1"), new Period(5, "some other mode", null, 756L, "u2"));
+    .setPeriod(new Period(2, "some mode", null, 95l, "u1"), new Period(5, "some other mode", null, 756L, "u2"));
 
   @Test
   public void verify_aggregation_on_value() throws Exception {
@@ -218,7 +218,7 @@ public class ViewsFormulaExecutorComponentVisitorTest {
     @Override
     public Optional<Measure> createMeasure(FakeCounter counter, CreateMeasureContext context) {
       // verify the context which is passed to the method
-      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriods());
+      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriod());
       assertThat(context.getComponent()).isNotNull();
       assertThat(context.getMetric()).isSameAs(metricRepository.getByKey(NCLOC_KEY));
 
@@ -241,7 +241,7 @@ public class ViewsFormulaExecutorComponentVisitorTest {
     @Override
     public Optional<Measure> createMeasure(FakeCounter counter, CreateMeasureContext context) {
       // verify the context which is passed to the method
-      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriods());
+      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriod());
       assertThat(context.getComponent()).isNotNull();
       assertThat(context.getMetric())
         .isIn(metricRepository.getByKey(NEW_LINES_TO_COVER_KEY), metricRepository.getByKey(NEW_COVERAGE_KEY));
@@ -294,7 +294,7 @@ public class ViewsFormulaExecutorComponentVisitorTest {
     @Override
     public Optional<Measure> createMeasure(FakeVariationCounter counter, CreateMeasureContext context) {
       // verify the context which is passed to the method
-      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriods());
+      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriod());
       assertThat(context.getComponent()).isNotNull();
       assertThat(context.getMetric()).isSameAs(metricRepository.getByKey(NEW_COVERAGE_KEY));
 
@@ -315,7 +315,7 @@ public class ViewsFormulaExecutorComponentVisitorTest {
   }
 
   private class FakeVariationCounter implements Counter<FakeVariationCounter> {
-    private final IntVariationValue.Array values = IntVariationValue.newArray();
+    private final IntCounter.Array values = IntCounter.newArray();
 
     @Override
     public void aggregate(FakeVariationCounter counter) {
@@ -369,7 +369,7 @@ public class ViewsFormulaExecutorComponentVisitorTest {
 
   private void verifyLeafContext(CounterInitializationContext context) {
     assertThat(context.getLeaf().getChildren()).isEmpty();
-    assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriods());
+    assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriod());
   }
 
 }

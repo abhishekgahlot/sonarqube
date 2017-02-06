@@ -19,7 +19,7 @@
  */
 package org.sonar.server.computation.task.projectanalysis.formula;
 
-import java.util.List;
+import javax.annotation.CheckForNull;
 import org.sonar.server.computation.task.projectanalysis.component.Component;
 import org.sonar.server.computation.task.projectanalysis.metric.Metric;
 import org.sonar.server.computation.task.projectanalysis.period.Period;
@@ -39,7 +39,8 @@ public interface CreateMeasureContext {
   Metric getMetric();
 
   /**
-   * The periods for which variations of the measure can be created.
+   * The period for which variation of the measure can be created.
    */
-  List<Period> getPeriods();
+  @CheckForNull
+  Period getPeriod();
 }

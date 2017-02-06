@@ -47,8 +47,8 @@ import org.sonar.server.computation.task.projectanalysis.formula.CounterInitiali
 import org.sonar.server.computation.task.projectanalysis.formula.CreateMeasureContext;
 import org.sonar.server.computation.task.projectanalysis.formula.Formula;
 import org.sonar.server.computation.task.projectanalysis.formula.FormulaExecutorComponentVisitor;
-import org.sonar.server.computation.task.projectanalysis.formula.counter.DoubleVariationValue;
-import org.sonar.server.computation.task.projectanalysis.formula.counter.IntVariationValue;
+import org.sonar.server.computation.task.projectanalysis.formula.counter.DoubleCounter;
+import org.sonar.server.computation.task.projectanalysis.formula.counter.IntCounter;
 import org.sonar.server.computation.task.projectanalysis.measure.Measure;
 import org.sonar.server.computation.task.projectanalysis.measure.MeasureRepository;
 import org.sonar.server.computation.task.projectanalysis.measure.MeasureVariations;
@@ -103,9 +103,9 @@ public class NewSizeMeasuresStep implements ComputationStep {
   private static class NewSizeCounter implements Counter<NewSizeCounter> {
     private final DuplicationRepository duplicationRepository;
     private final ScmInfoRepository scmInfoRepository;
-    private final IntVariationValue.Array newLines = IntVariationValue.newArray();
-    private final IntVariationValue.Array newDuplicatedLines = IntVariationValue.newArray();
-    private final IntVariationValue.Array newDuplicatedBlocks = IntVariationValue.newArray();
+    private final IntCounter.Array newLines = IntCounter.newArray();
+    private final IntCounter.Array newDuplicatedLines = IntCounter.newArray();
+    private final IntCounter.Array newDuplicatedBlocks = IntCounter.newArray();
 
     private NewSizeCounter(DuplicationRepository duplicationRepository,
       ScmInfoRepository scmInfoRepository) {
@@ -249,7 +249,7 @@ public class NewSizeMeasuresStep implements ComputationStep {
     private static Optional<Measure> createNewDuplicatedLinesDensityMeasure(NewSizeCounter counter, CreateMeasureContext context) {
       Optional<MeasureVariations> newLines = counter.newLines.toMeasureVariations();
       Optional<MeasureVariations> newDuplicatedLines = counter.newDuplicatedLines.toMeasureVariations();
-      DoubleVariationValue.Array newDuplicatedLinesDensity = DoubleVariationValue.newArray();
+      DoubleCounter.Array newDuplicatedLinesDensity = DoubleCounter.newArray();
       if (newLines.isPresent() && newDuplicatedLines.isPresent()) {
         MeasureVariations newLinesVariations = newLines.get();
         MeasureVariations newDuplicatedLinesVariations = newDuplicatedLines.get();

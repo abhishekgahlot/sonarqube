@@ -31,8 +31,8 @@ import org.sonar.db.component.ComponentTesting;
 import org.sonar.db.component.SnapshotDto;
 import org.sonar.db.measure.MeasureDto;
 import org.sonar.server.computation.task.projectanalysis.batch.BatchReportReaderRule;
-import org.sonar.server.computation.task.projectanalysis.component.TreeRootHolderRule;
 import org.sonar.server.computation.task.projectanalysis.component.Component;
+import org.sonar.server.computation.task.projectanalysis.component.TreeRootHolderRule;
 import org.sonar.server.computation.task.projectanalysis.component.ViewsComponent;
 import org.sonar.server.computation.task.projectanalysis.measure.Measure;
 import org.sonar.server.computation.task.projectanalysis.measure.MeasureRepositoryRule;
@@ -98,7 +98,7 @@ public class ViewsComputeMeasureVariationsStepTest {
     dbClient.measureDao().insert(session, newMeasureDto(ISSUES_METRIC.getId(), VIEW_UUID, period1ViewSnapshot.getUuid(), 60d));
     session.commit();
 
-    periodsHolder.setPeriods(newPeriod(1, period1ViewSnapshot));
+    periodsHolder.setPeriod(newPeriod(1, period1ViewSnapshot));
 
     treeRootHolder.setRoot(VIEW);
 
@@ -111,7 +111,7 @@ public class ViewsComputeMeasureVariationsStepTest {
   public void do_nothing_when_no_period() {
     Component view = ViewsComponent.builder(Component.Type.VIEW, 1).setUuid(VIEW_UUID).build();
     treeRootHolder.setRoot(view);
-    periodsHolder.setPeriods();
+    periodsHolder.setPeriod();
 
     underTest.execute();
 
@@ -131,7 +131,7 @@ public class ViewsComputeMeasureVariationsStepTest {
     dbClient.measureDao().insert(session, newMeasureDto(ISSUES_METRIC.getId(), subviewDto.uuid(), period1Snapshot.getUuid(), 10d));
     session.commit();
 
-    periodsHolder.setPeriods(newPeriod(1, period1Snapshot));
+    periodsHolder.setPeriod(newPeriod(1, period1Snapshot));
 
     Component subview = ViewsComponent.builder(Component.Type.SUBVIEW, 2).setUuid(subviewDto.uuid()).build();
     Component view = ViewsComponent.builder(Component.Type.VIEW, 1).setUuid(VIEW_UUID).addChildren(subview).build();
@@ -163,7 +163,7 @@ public class ViewsComputeMeasureVariationsStepTest {
       newMeasureDto(ISSUES_METRIC.getId(), VIEW_UUID, period5ViewSnapshot.getUuid(), 100d));
     session.commit();
 
-    periodsHolder.setPeriods(newPeriod(1, period1ViewSnapshot),
+    periodsHolder.setPeriod(newPeriod(1, period1ViewSnapshot),
       newPeriod(2, period2ViewSnapshot),
       newPeriod(3, period3ViewSnapshot),
       newPeriod(4, period4ViewSnapshot),
@@ -198,7 +198,7 @@ public class ViewsComputeMeasureVariationsStepTest {
       );
     session.commit();
 
-    periodsHolder.setPeriods(newPeriod(1, period1ViewSnapshot));
+    periodsHolder.setPeriod(newPeriod(1, period1ViewSnapshot));
 
     treeRootHolder.setRoot(VIEW);
 

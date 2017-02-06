@@ -20,7 +20,7 @@
 package org.sonar.server.computation.task.projectanalysis.formula;
 
 import com.google.common.base.Optional;
-import java.util.List;
+import javax.annotation.CheckForNull;
 import org.sonar.server.computation.task.projectanalysis.component.Component;
 import org.sonar.server.computation.task.projectanalysis.measure.Measure;
 import org.sonar.server.computation.task.projectanalysis.period.Period;
@@ -41,8 +41,9 @@ public interface CounterInitializationContext {
   Optional<Measure> getMeasure(String metricKey);
 
   /**
-   * Lists of Periods defined for the current project. They can be used to retrieve variations Measure.
+   * Leak period defined for the current project. They can be used to retrieve variations Measure.
    */
-  List<Period> getPeriods();
+  @CheckForNull
+  Period getPeriod();
 
 }

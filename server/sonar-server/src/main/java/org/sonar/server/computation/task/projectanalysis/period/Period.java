@@ -30,19 +30,13 @@ import static java.util.Objects.requireNonNull;
 
 @Immutable
 public class Period {
-  private final int index;
   private final String mode;
   @CheckForNull
   private final String modeParameter;
   private final long snapshotDate;
   private final String analysisUuid;
 
-  public Period(int index, String mode, @Nullable String modeParameter,
-    long snapshotDate, String analysisUuid) {
-    if (!isValidPeriodIndex(index)) {
-      throw new IllegalArgumentException(String.format("Period index (%s) must be > 0 and < 6", index));
-    }
-    this.index = index;
+  public Period(String mode, @Nullable String modeParameter, long snapshotDate, String analysisUuid) {
     this.mode = requireNonNull(mode);
     this.modeParameter = modeParameter;
     this.snapshotDate = snapshotDate;
@@ -51,13 +45,6 @@ public class Period {
 
   public static boolean isValidPeriodIndex(int i) {
     return i > 0 && i < 6;
-  }
-
-  /**
-   * Index of periods is 1-based. It goes from 1 to 5.
-   */
-  public int getIndex() {
-    return index;
   }
 
   public String getMode() {
@@ -86,8 +73,7 @@ public class Period {
       return false;
     }
     Period period = (Period) o;
-    return index == period.index
-      && snapshotDate == period.snapshotDate
+    return snapshotDate == period.snapshotDate
       && Objects.equals(analysisUuid, period.analysisUuid)
       && mode.equals(period.mode)
       && Objects.equals(modeParameter, period.modeParameter);
@@ -95,13 +81,12 @@ public class Period {
 
   @Override
   public int hashCode() {
-    return hash(index, mode, modeParameter, snapshotDate, analysisUuid);
+    return hash(mode, modeParameter, snapshotDate, analysisUuid);
   }
 
   @Override
   public String toString() {
     return toStringHelper(this)
-      .add("index", index)
       .add("mode", mode)
       .add("modeParameter", modeParameter)
       .add("snapshotDate", snapshotDate)

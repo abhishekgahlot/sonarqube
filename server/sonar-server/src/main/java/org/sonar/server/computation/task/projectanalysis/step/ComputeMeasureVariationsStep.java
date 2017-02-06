@@ -115,7 +115,7 @@ public class ComputeMeasureVariationsStep implements ComputationStep {
 
     private MeasuresWithVariationRepository computeMeasuresWithVariations(Component component) {
       MeasuresWithVariationRepository measuresWithVariationRepository = new MeasuresWithVariationRepository();
-      for (Period period : periodsHolder.getPeriods()) {
+      for (Period period : periodsHolder.getPeriod()) {
         List<PastMeasureDto> pastMeasures = dbClient.measureDao()
           .selectPastMeasures(session, component.getUuid(), period.getAnalysisUuid(), metricIds);
         setVariationMeasures(component, pastMeasures, period.getIndex(), measuresWithVariationRepository);

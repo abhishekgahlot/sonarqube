@@ -95,7 +95,7 @@ public class PersistAnalysisStep implements ComputationStep {
     }
 
     private void updateSnapshotPeriods(SnapshotDto snapshotDto) {
-      List<Period> periods = periodsHolder.getPeriods();
+      List<Period> periods = periodsHolder.getPeriod();
       if (periods.isEmpty()) {
         return;
       }

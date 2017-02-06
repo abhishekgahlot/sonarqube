@@ -40,7 +40,7 @@ import org.sonar.server.computation.task.projectanalysis.formula.CreateMeasureCo
 import org.sonar.server.computation.task.projectanalysis.formula.Formula;
 import org.sonar.server.computation.task.projectanalysis.formula.FormulaExecutorComponentVisitor;
 import org.sonar.server.computation.task.projectanalysis.formula.VariationSumFormula;
-import org.sonar.server.computation.task.projectanalysis.formula.counter.IntVariationValue;
+import org.sonar.server.computation.task.projectanalysis.formula.counter.IntCounter;
 import org.sonar.server.computation.task.projectanalysis.formula.coverage.LinesAndConditionsWithUncoveredMetricKeys;
 import org.sonar.server.computation.task.projectanalysis.formula.coverage.LinesAndConditionsWithUncoveredVariationFormula;
 import org.sonar.server.computation.task.projectanalysis.formula.coverage.SingleWithUncoveredMetricKeys;
@@ -57,7 +57,6 @@ import org.sonar.server.computation.task.projectanalysis.scm.ScmInfoRepository;
 import org.sonar.server.computation.task.step.ComputationStep;
 
 import static org.sonar.server.computation.task.projectanalysis.measure.Measure.newMeasureBuilder;
-import static org.sonar.server.computation.task.projectanalysis.period.PeriodPredicates.viewsRestrictedPeriods;
 
 /**
  * Computes measures related to the New Coverage. These measures do not have values, only variations.
@@ -143,10 +142,10 @@ public class NewCoverageMeasuresStep implements ComputationStep {
      */
     private static Iterable<Formula<?>> variationSumFormulas(NewCoverageOutputMetricKeys outputMetricKeys) {
       return ImmutableList.of(
-        new VariationSumFormula(outputMetricKeys.getNewLinesToCover(), viewsRestrictedPeriods()),
-        new VariationSumFormula(outputMetricKeys.getNewUncoveredLines(), viewsRestrictedPeriods()),
-        new VariationSumFormula(outputMetricKeys.getNewConditionsToCover(), viewsRestrictedPeriods()),
-        new VariationSumFormula(outputMetricKeys.getNewUncoveredConditions(), viewsRestrictedPeriods()));
+        new VariationSumFormula(outputMetricKeys.getNewLinesToCover()),
+        new VariationSumFormula(outputMetricKeys.getNewUncoveredLines()),
+        new VariationSumFormula(outputMetricKeys.getNewConditionsToCover()),
+        new VariationSumFormula(outputMetricKeys.getNewUncoveredConditions()));
     }
   }
 
@@ -195,11 +194,10 @@ public class NewCoverageMeasuresStep implements ComputationStep {
     @Override
     public Optional<Measure> createMeasure(NewCoverageCounter counter, CreateMeasureContext context) {
       MeasureVariations.Builder builder = MeasureVariations.newMeasureVariationsBuilder();
-      for (Period period : context.getPeriods()) {
-        if (counter.hasNewCode(period)) {
-          int value = computeValueForMetric(counter, period, context.getMetric());
-          builder.setVariation(period, value);
-        }
+      Period period = context.getPeriod();
+      if (period != null && counter.hasNewCode()) {
+        int value = computeValueForMetric(counter, context.getMetric());
+        builder.setVariation(period, value);
       }
       if (builder.isEmpty()) {
         return Optional.absent();
@@ -207,18 +205,18 @@ public class NewCoverageMeasuresStep implements ComputationStep {
       return Optional.of(newMeasureBuilder().setVariations(builder.build()).createNoValue());
     }
 
-    private int computeValueForMetric(NewCoverageCounter counter, Period period, Metric metric) {
+    private int computeValueForMetric(NewCoverageCounter counter, Metric metric) {
       if (metric.getKey().equals(outputMetricKeys.getNewLinesToCover())) {
-        return counter.getNewLines(period);
+        return counter.getNewLines();
       }
       if (metric.getKey().equals(outputMetricKeys.getNewUncoveredLines())) {
-        return counter.getNewLines(period) - counter.getNewCoveredLines(period);
+        return counter.getNewLines() - counter.getNewCoveredLines();
       }
       if (metric.getKey().equals(outputMetricKeys.getNewConditionsToCover())) {
-        return counter.getNewConditions(period);
+        return counter.getNewConditions();
       }
       if (metric.getKey().equals(outputMetricKeys.getNewUncoveredConditions())) {
-        return counter.getNewConditions(period) - counter.getNewCoveredConditions(period);
+        return counter.getNewConditions() - counter.getNewCoveredConditions();
       }
       throw new IllegalArgumentException("Unsupported metric " + metric.getKey());
     }
@@ -235,10 +233,10 @@ public class NewCoverageMeasuresStep implements ComputationStep {
   }
 
   public static final class NewCoverageCounter implements org.sonar.server.computation.task.projectanalysis.formula.Counter<NewCoverageCounter> {
-    private final IntVariationValue.Array newLines = IntVariationValue.newArray();
-    private final IntVariationValue.Array newCoveredLines = IntVariationValue.newArray();
-    private final IntVariationValue.Array newConditions = IntVariationValue.newArray();
-    private final IntVariationValue.Array newCoveredConditions = IntVariationValue.newArray();
+    private final IntCounter newLines = new IntCounter();
+    private final IntCounter newCoveredLines = new IntCounter();
+    private final IntCounter newConditions = new IntCounter();
+    private final IntCounter newCoveredConditions = new IntCounter();
     private final ScmInfoRepository scmInfoRepository;
     private final NewCoverageInputMetricKeys metricKeys;
 
@@ -249,10 +247,10 @@ public class NewCoverageMeasuresStep implements ComputationStep {
 
     @Override
     public void aggregate(NewCoverageCounter counter) {
-      newLines.incrementAll(counter.newLines);
-      newCoveredLines.incrementAll(counter.newCoveredLines);
-      newConditions.incrementAll(counter.newConditions);
-      newCoveredConditions.incrementAll(counter.newCoveredConditions);
+      newLines.increment(counter.newLines);
+      newCoveredLines.increment(counter.newCoveredLines);
+      newConditions.increment(counter.newConditions);
+      newCoveredConditions.increment(counter.newCoveredConditions);
     }
 
     @Override
@@ -264,12 +262,13 @@ public class NewCoverageMeasuresStep implements ComputationStep {
       }
       ScmInfo componentScm = scmInfoOptional.get();
 
-      context.getPeriods().forEach(period -> {
-        newLines.increment(period, 0);
-        newCoveredLines.increment(period, 0);
-        newConditions.increment(period, 0);
-        newCoveredConditions.increment(period, 0);
-      });
+      Period period = context.getPeriod();
+      if (period != null) {
+        newLines.increment(0);
+        newCoveredLines.increment(0);
+        newConditions.increment(0);
+        newCoveredConditions.increment(0);
+      }
 
       Optional<Measure> hitsByLineMeasure = context.getMeasure(metricKeys.getCoverageLineHitsData());
       Map<Integer, Integer> hitsByLine = parseCountByLine(hitsByLineMeasure);
@@ -282,7 +281,7 @@ public class NewCoverageMeasuresStep implements ComputationStep {
         int conditions = (Integer) ObjectUtils.defaultIfNull(conditionsByLine.get(lineId), 0);
         int coveredConditions = (Integer) ObjectUtils.defaultIfNull(coveredConditionsByLine.get(lineId), 0);
         long date = componentScm.getChangesetForLine(lineId).getDate();
-        analyze(context.getPeriods(), date, hits, conditions, coveredConditions);
+        analyze(period, date, hits, conditions, coveredConditions);
       }
     }
 
@@ -293,15 +292,13 @@ public class NewCoverageMeasuresStep implements ComputationStep {
       return Collections.emptyMap();
     }
 
-    public void analyze(List<Period> periods, @Nullable Long lineDate, int hits, int conditions, int coveredConditions) {
+    public void analyze(Period period, @Nullable Long lineDate, int hits, int conditions, int coveredConditions) {
       if (lineDate == null) {
         return;
       }
-      for (Period period : periods) {
-        if (isLineInPeriod(lineDate, period)) {
-          incrementLines(period, hits);
-          incrementConditions(period, conditions, coveredConditions);
-        }
+      if (isLineInPeriod(lineDate, period)) {
+        incrementLines(hits);
+        incrementConditions(conditions, coveredConditions);
       }
     }
 
@@ -312,38 +309,38 @@ public class NewCoverageMeasuresStep implements ComputationStep {
       return lineDate > period.getSnapshotDate();
     }
 
-    private void incrementLines(Period period, int hits) {
-      newLines.increment(period, 1);
+    private void incrementLines(int hits) {
+      newLines.increment(1);
       if (hits > 0) {
-        newCoveredLines.increment(period, 1);
+        newCoveredLines.increment(1);
       }
     }
 
-    private void incrementConditions(Period period, int conditions, int coveredConditions) {
-      newConditions.increment(period, conditions);
+    private void incrementConditions(int conditions, int coveredConditions) {
+      newConditions.increment(conditions);
       if (conditions > 0) {
-        newCoveredConditions.increment(period, coveredConditions);
+        newCoveredConditions.increment(coveredConditions);
       }
     }
 
-    public boolean hasNewCode(Period period) {
-      return newLines.get(period).isSet();
+    public boolean hasNewCode() {
+      return newLines.isSet();
     }
 
-    public int getNewLines(Period period) {
-      return newLines.get(period).getValue();
+    public int getNewLines() {
+      return newLines.getValue();
     }
 
-    public int getNewCoveredLines(Period period) {
-      return newCoveredLines.get(period).getValue();
+    public int getNewCoveredLines() {
+      return newCoveredLines.getValue();
     }
 
-    public int getNewConditions(Period period) {
-      return newConditions.get(period).getValue();
+    public int getNewConditions() {
+      return newConditions.getValue();
     }
 
-    public int getNewCoveredConditions(Period period) {
-      return newCoveredConditions.get(period).getValue();
+    public int getNewCoveredConditions() {
+      return newCoveredConditions.getValue();
     }
   }
 

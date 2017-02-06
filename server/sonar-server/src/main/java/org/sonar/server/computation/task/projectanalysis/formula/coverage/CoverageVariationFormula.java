@@ -22,13 +22,11 @@ package org.sonar.server.computation.task.projectanalysis.formula.coverage;
 import com.google.common.base.Optional;
 import org.sonar.server.computation.task.projectanalysis.formula.CreateMeasureContext;
 import org.sonar.server.computation.task.projectanalysis.formula.Formula;
-import org.sonar.server.computation.task.projectanalysis.formula.counter.LongVariationValue;
+import org.sonar.server.computation.task.projectanalysis.formula.counter.LongCounter;
 import org.sonar.server.computation.task.projectanalysis.measure.Measure;
 import org.sonar.server.computation.task.projectanalysis.measure.MeasureVariations;
-import org.sonar.server.computation.task.projectanalysis.period.Period;
 
 import static org.sonar.server.computation.task.projectanalysis.formula.coverage.CoverageUtils.calculateCoverage;
-import static org.sonar.server.computation.task.projectanalysis.formula.coverage.CoverageUtils.supportedPeriods;
 import static org.sonar.server.computation.task.projectanalysis.measure.Measure.newMeasureBuilder;
 
 /**
@@ -49,12 +47,13 @@ public abstract class CoverageVariationFormula<T extends ElementsAndCoveredEleme
 
   private MeasureVariations.Builder createAndPopulateBuilder(T counter, CreateMeasureContext context) {
     MeasureVariations.Builder builder = MeasureVariations.newMeasureVariationsBuilder();
-    for (Period period : supportedPeriods(context)) {
-      LongVariationValue elements = counter.elements.get(period);
-      if (elements.isSet() && elements.getValue() > 0d) {
-        LongVariationValue coveredElements = counter.coveredElements.get(period);
-        builder.setVariation(period, calculateCoverage(coveredElements.getValue(), elements.getValue()));
-      }
+    if (context.getPeriods()) {
+
+    }
+    LongCounter elements = counter.elements;
+    if (elements.isSet() && elements.getValue() > 0d) {
+      LongCounter coveredElements = counter.coveredElements;
+      builder.setVariation(period, calculateCoverage(coveredElements.getValue(), elements.getValue()));
     }
     return builder;
   }

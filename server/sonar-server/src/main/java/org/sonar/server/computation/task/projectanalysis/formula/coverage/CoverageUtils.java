@@ -20,16 +20,11 @@
 package org.sonar.server.computation.task.projectanalysis.formula.coverage;
 
 import com.google.common.base.Optional;
-import org.sonar.server.computation.task.projectanalysis.component.Component;
 import org.sonar.server.computation.task.projectanalysis.formula.CounterInitializationContext;
-import org.sonar.server.computation.task.projectanalysis.formula.CreateMeasureContext;
 import org.sonar.server.computation.task.projectanalysis.measure.Measure;
 import org.sonar.server.computation.task.projectanalysis.measure.MeasureVariations;
-import org.sonar.server.computation.task.projectanalysis.period.Period;
 
-import static com.google.common.collect.FluentIterable.from;
 import static org.sonar.server.computation.task.projectanalysis.measure.Measure.newMeasureBuilder;
-import static org.sonar.server.computation.task.projectanalysis.period.PeriodPredicates.viewsRestrictedPeriods;
 
 public final class CoverageUtils {
   private static final Measure DEFAULT_MEASURE = newMeasureBuilder().create(0L);
@@ -62,34 +57,11 @@ public final class CoverageUtils {
     return measure.get().getVariations();
   }
 
-  static long getLongVariation(MeasureVariations variations, Period period) {
-    if (variations.hasVariation(period.getIndex())) {
-      return (long) variations.getVariation(period.getIndex());
+  static long getLongVariation(MeasureVariations variations) {
+    if (variations.hasVariation(1)) {
+      return (long) variations.getVariation(1);
     }
     return 0L;
-  }
-
-  /**
-   * Since Periods 4 and 5 can be customized per project and/or per view/subview, aggregating values on this period
-   * will only generate garbage data which will make no sense. These Periods should be ignored when processing views/subviews.
-   */
-  static Iterable<Period> supportedPeriods(CreateMeasureContext context) {
-    return supportedPeriods(context.getComponent().getType(), context.getPeriods());
-  }
-
-  /**
-   * Since Periods 4 and 5 can be customized per project and/or per view/subview, aggregating values on this period
-   * will only generate garbage data which will make no sense. These Periods should be ignored when processing views/subviews.
-   */
-  public static Iterable<Period> supportedPeriods(CounterInitializationContext context) {
-    return supportedPeriods(context.getLeaf().getType(), context.getPeriods());
-  }
-
-  private static Iterable<Period> supportedPeriods(Component.Type type, Iterable<Period> periods) {
-    if (type.isReportType()) {
-      return periods;
-    }
-    return from(periods).filter(viewsRestrictedPeriods());
   }
 
 }

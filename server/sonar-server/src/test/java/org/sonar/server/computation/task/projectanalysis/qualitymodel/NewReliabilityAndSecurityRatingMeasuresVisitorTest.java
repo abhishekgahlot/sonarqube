@@ -106,7 +106,7 @@ public class NewReliabilityAndSecurityRatingMeasuresVisitorTest {
   public MeasureRepositoryRule measureRepository = MeasureRepositoryRule.create(treeRootHolder, metricRepository);
 
   @Rule
-  public PeriodsHolderRule periodsHolder = new PeriodsHolderRule().setPeriods(new Period(1, "mode", null, LEAK_PERIOD_SNAPSHOT_IN_MILLISEC, "UUID"));
+  public PeriodsHolderRule periodsHolder = new PeriodsHolderRule().setPeriod(new Period(1, "mode", null, LEAK_PERIOD_SNAPSHOT_IN_MILLISEC, "UUID"));
 
   @Rule
   public ComponentIssuesRepositoryRule componentIssuesRepositoryRule = new ComponentIssuesRepositoryRule(treeRootHolder);
@@ -130,7 +130,7 @@ public class NewReliabilityAndSecurityRatingMeasuresVisitorTest {
 
   @Test
   public void no_measure_if_there_is_no_period() {
-    periodsHolder.setPeriods();
+    periodsHolder.setPeriod();
     treeRootHolder.setRoot(builder(PROJECT, 1).build());
 
     underTest.visit(treeRootHolder.getRoot());

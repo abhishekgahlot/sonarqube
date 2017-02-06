@@ -28,8 +28,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.sonar.api.config.Settings;
 import org.sonar.api.config.MapSettings;
+import org.sonar.api.config.Settings;
 import org.sonar.api.utils.System2;
 import org.sonar.api.utils.log.LogTester;
 import org.sonar.db.DbClient;
@@ -111,7 +111,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     // No project, no snapshot
 
     underTest.execute();
-    assertThat(periodsHolder.getPeriods()).isEmpty();
+    assertThat(periodsHolder.getPeriod()).isEmpty();
   }
 
   @Test
@@ -125,7 +125,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", textDate);
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
     assertThat(periods).hasSize(1);
 
     Period period = periods.get(0);
@@ -145,7 +145,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "UNKNWOWN VERSION");
 
     underTest.execute();
-    assertThat(periodsHolder.getPeriods()).isEmpty();
+    assertThat(periodsHolder.getPeriod()).isEmpty();
   }
 
   @Test
@@ -158,7 +158,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "");
 
     underTest.execute();
-    assertThat(periodsHolder.getPeriods()).isEmpty();
+    assertThat(periodsHolder.getPeriod()).isEmpty();
   }
 
   @Test
@@ -171,7 +171,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "100");
 
     underTest.execute();
-    assertThat(periodsHolder.getPeriods()).isEmpty();
+    assertThat(periodsHolder.getPeriod()).isEmpty();
   }
 
   @Test
@@ -185,7 +185,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", textDate);
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
     assertThat(periods).hasSize(1);
 
     Period period = periods.get(0);
@@ -210,7 +210,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", date);
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
     assertThat(periods).hasSize(1);
 
     // Analysis form 2008-11-29
@@ -232,7 +232,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "2008-11-30");
 
     underTest.execute();
-    assertThat(periodsHolder.getPeriods()).isEmpty();
+    assertThat(periodsHolder.getPeriod()).isEmpty();
   }
 
   @Test
@@ -245,7 +245,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "10");
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
     assertThat(periods).hasSize(1);
 
     // return analysis from 2008-11-20
@@ -269,7 +269,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "0");
 
     underTest.execute();
-    assertThat(periodsHolder.getPeriods()).isEmpty();
+    assertThat(periodsHolder.getPeriod()).isEmpty();
   }
 
   @Test
@@ -282,7 +282,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "previous_analysis");
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
     assertThat(periods).hasSize(1);
 
     // return analysis from 2008-11-29
@@ -306,7 +306,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "previous_analysis");
 
     underTest.execute();
-    assertThat(periodsHolder.getPeriods()).isEmpty();
+    assertThat(periodsHolder.getPeriod()).isEmpty();
   }
 
   @Test
@@ -318,7 +318,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "previous_version");
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
     assertThat(periods).hasSize(1);
 
     // Analysis form 2008-11-12
@@ -341,7 +341,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "previous_version");
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
     assertThat(periods).hasSize(0);
   }
 
@@ -354,7 +354,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "previous_version");
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
     assertThat(periods).hasSize(1);
 
     // Analysis form 2008-11-11
@@ -375,7 +375,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "previous_version");
 
     underTest.execute();
-    assertThat(periodsHolder.getPeriods()).isEmpty();
+    assertThat(periodsHolder.getPeriod()).isEmpty();
   }
 
   @Test
@@ -387,7 +387,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "previous_version");
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
     assertThat(periods).hasSize(1);
 
     Period period = periods.get(0);
@@ -406,7 +406,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "previous_version");
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
     assertThat(periods).hasSize(1);
 
     Period period = periods.get(0);
@@ -425,7 +425,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "previous_version");
 
     underTest.execute();
-    assertThat(periodsHolder.getPeriods()).isEmpty();
+    assertThat(periodsHolder.getPeriod()).isEmpty();
   }
 
   @Test
@@ -438,7 +438,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "0.9");
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
     assertThat(periods).hasSize(1);
 
     // Analysis form 2008-11-11
@@ -462,7 +462,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period1", "0.8");
 
     underTest.execute();
-    assertThat(periodsHolder.getPeriods()).isEmpty();
+    assertThat(periodsHolder.getPeriod()).isEmpty();
   }
 
   @Test
@@ -478,7 +478,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period5", "0.9"); // Analysis from 2008-11-11
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
 
     assertThat(periods).extracting("mode").containsExactly(TIMEMACHINE_MODE_DATE, TIMEMACHINE_MODE_DAYS,
       TIMEMACHINE_MODE_PREVIOUS_ANALYSIS, TIMEMACHINE_MODE_PREVIOUS_VERSION,
@@ -518,7 +518,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period5", "0.9"); // Analysis from 2008-11-11
 
     underTest.execute();
-    List<Period> periods = periodsHolder.getPeriods();
+    List<Period> periods = periodsHolder.getPeriod();
 
     assertThat(periods).extracting("mode").containsExactly(
       TIMEMACHINE_MODE_DATE, TIMEMACHINE_MODE_DAYS,
@@ -551,7 +551,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period5.TRK", "previous_analysis");
 
     underTest.execute();
-    assertThat(periodsHolder.getPeriods()).hasSize(2);
+    assertThat(periodsHolder.getPeriod()).hasSize(2);
   }
 
   @Test
@@ -564,7 +564,7 @@ public class LoadPeriodsStepTest extends BaseStepTest {
     settings.setProperty("sonar.timemachine.period5.VW", "previous_analysis");
 
     underTest.execute();
-    assertThat(periodsHolder.getPeriods()).hasSize(2);
+    assertThat(periodsHolder.getPeriod()).hasSize(2);
   }
 
 }

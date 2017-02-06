@@ -23,59 +23,59 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DoubleVariationValueTest {
+public class DoubleCounterTest {
   @Test
   public void newly_created_DoubleVariationValue_is_unset_and_has_value_0() {
-    verifyUnsetVariationValue(new DoubleVariationValue());
+    verifyUnsetVariationValue(new DoubleCounter());
   }
 
   @Test
   public void increment_double_sets_DoubleVariationValue_and_increments_value() {
-    verifySetVariationValue(new DoubleVariationValue().increment(10.6), 10.6);
+    verifySetVariationValue(new DoubleCounter().increment(10.6), 10.6);
   }
 
   @Test
   public void increment_DoubleVariationValue_has_no_effect_if_arg_is_null() {
-    verifyUnsetVariationValue(new DoubleVariationValue().increment(null));
+    verifyUnsetVariationValue(new DoubleCounter().increment(null));
   }
 
   @Test
   public void increment_DoubleVariationValue_has_no_effect_if_arg_is_unset() {
-    verifyUnsetVariationValue(new DoubleVariationValue().increment(new DoubleVariationValue()));
+    verifyUnsetVariationValue(new DoubleCounter().increment(new DoubleCounter()));
   }
 
   @Test
   public void increment_DoubleVariationValue_increments_by_the_value_of_the_arg() {
-    DoubleVariationValue source = new DoubleVariationValue().increment(10);
-    DoubleVariationValue target = new DoubleVariationValue().increment(source);
+    DoubleCounter source = new DoubleCounter().increment(10);
+    DoubleCounter target = new DoubleCounter().increment(source);
 
     verifySetVariationValue(target, 10);
   }
 
   @Test
   public void multiple_calls_to_increment_DoubleVariationValue_increments_by_the_value_of_the_arg() {
-    DoubleVariationValue target = new DoubleVariationValue()
-      .increment(new DoubleVariationValue().increment(35))
-      .increment(new DoubleVariationValue().increment(10));
+    DoubleCounter target = new DoubleCounter()
+      .increment(new DoubleCounter().increment(35))
+      .increment(new DoubleCounter().increment(10));
 
     verifySetVariationValue(target, 45);
   }
 
   @Test
   public void multiples_calls_to_increment_double_increment_the_value() {
-    DoubleVariationValue variationValue = new DoubleVariationValue()
+    DoubleCounter variationValue = new DoubleCounter()
       .increment(10.6)
       .increment(95.4);
 
     verifySetVariationValue(variationValue, 106);
   }
 
-  private static void verifyUnsetVariationValue(DoubleVariationValue variationValue) {
+  private static void verifyUnsetVariationValue(DoubleCounter variationValue) {
     assertThat(variationValue.isSet()).isFalse();
     assertThat(variationValue.getValue()).isEqualTo(0);
   }
 
-  private static void verifySetVariationValue(DoubleVariationValue variationValue, double expected) {
+  private static void verifySetVariationValue(DoubleCounter variationValue, double expected) {
     assertThat(variationValue.isSet()).isTrue();
     assertThat(variationValue.getValue()).isEqualTo(expected);
   }

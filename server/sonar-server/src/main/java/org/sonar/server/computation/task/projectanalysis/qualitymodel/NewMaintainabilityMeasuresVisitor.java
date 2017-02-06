@@ -29,7 +29,7 @@ import org.sonar.api.utils.log.Loggers;
 import org.sonar.server.computation.task.projectanalysis.component.Component;
 import org.sonar.server.computation.task.projectanalysis.component.CrawlerDepthLimit;
 import org.sonar.server.computation.task.projectanalysis.component.PathAwareVisitorAdapter;
-import org.sonar.server.computation.task.projectanalysis.formula.counter.LongVariationValue;
+import org.sonar.server.computation.task.projectanalysis.formula.counter.LongCounter;
 import org.sonar.server.computation.task.projectanalysis.issue.IntegrateIssuesVisitor;
 import org.sonar.server.computation.task.projectanalysis.measure.Measure;
 import org.sonar.server.computation.task.projectanalysis.measure.MeasureRepository;
@@ -120,7 +120,7 @@ public class NewMaintainabilityMeasuresVisitor extends PathAwareVisitorAdapter<N
   private void computeAndSaveNewDebtRatioMeasure(Component component, Path<Counter> path) {
     MeasureVariations.Builder newDebtRatio = newMeasureVariationsBuilder();
     MeasureVariations.Builder newMaintainability = newMeasureVariationsBuilder();
-    for (Period period : periodsHolder.getPeriods()) {
+    for (Period period : periodsHolder.getPeriod()) {
       double density = computeDensity(path.current(), period);
       newDebtRatio.setVariation(period, 100.0 * density);
       newMaintainability.setVariation(period, ratingGrid.getRatingForDensity(density).getIndex());
@@ -134,7 +134,7 @@ public class NewMaintainabilityMeasuresVisitor extends PathAwareVisitorAdapter<N
   }
 
   private static double computeDensity(Counter counter, Period period) {
-    LongVariationValue newDebt = counter.getNewDebt(period);
+    LongCounter newDebt = counter.getNewDebt(period);
     if (newDebt.isSet()) {
       long developmentCost = counter.getDevCost(period).getValue();
       if (developmentCost != 0L) {
@@ -160,7 +160,7 @@ public class NewMaintainabilityMeasuresVisitor extends PathAwareVisitorAdapter<N
 
   private void initNewDebtRatioCounter(Component file, Path<Counter> path) {
     // first analysis, no period, no differential value to compute, save processing time and return now
-    if (periodsHolder.getPeriods().isEmpty()) {
+    if (periodsHolder.getPeriod().isEmpty()) {
       return;
     }
 
@@ -185,14 +185,14 @@ public class NewMaintainabilityMeasuresVisitor extends PathAwareVisitorAdapter<N
     long lineDevCost = ratingSettings.getDevCost(file.getFileAttributes().getLanguageKey());
     for (Integer nclocLineIndex : nclocLineIndexes(nclocDataMeasure)) {
       Changeset changeset = scmInfo.getChangesetForLine(nclocLineIndex);
-      for (Period period : periodsHolder.getPeriods()) {
+      for (Period period : periodsHolder.getPeriod()) {
         if (isLineInPeriod(changeset.getDate(), period)) {
           devCostCounter.incrementDevCost(period, lineDevCost);
           hasDevCost[period.getIndex() - 1] = true;
         }
       }
     }
-    for (Period period : periodsHolder.getPeriods()) {
+    for (Period period : periodsHolder.getPeriod()) {
       if (hasDevCost[period.getIndex() - 1]) {
         long newDebt = getLongValue(measureRepository.getRawMeasure(file, this.newDebtMetric), period);
         devCostCounter.incrementNewDebt(period, newDebt);
@@ -227,27 +227,27 @@ public class NewMaintainabilityMeasuresVisitor extends PathAwareVisitorAdapter<N
   }
 
   public static final class Counter {
-    private final LongVariationValue.Array newDebt = LongVariationValue.newArray();
-    private final LongVariationValue.Array devCost = LongVariationValue.newArray();
+    private final LongCounter.Array newDebt = LongCounter.newArray();
+    private final LongCounter.Array devCost = LongCounter.newArray();
 
     public void add(Counter counter) {
       this.newDebt.incrementAll(counter.newDebt);
       this.devCost.incrementAll(counter.devCost);
     }
 
-    LongVariationValue.Array incrementNewDebt(Period period, long value) {
+    LongCounter.Array incrementNewDebt(Period period, long value) {
       return newDebt.increment(period, value);
     }
 
-    LongVariationValue.Array incrementDevCost(Period period, long value) {
+    LongCounter.Array incrementDevCost(Period period, long value) {
       return devCost.increment(period, value);
     }
 
-    LongVariationValue getNewDebt(Period period) {
+    LongCounter getNewDebt(Period period) {
       return this.newDebt.get(period);
     }
 
-    LongVariationValue getDevCost(Period period) {
+    LongCounter getDevCost(Period period) {
       return this.devCost.get(period);
     }
   }

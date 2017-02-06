@@ -149,7 +149,7 @@ public class IssueCounterTest {
 
   @Test
   public void count_issues_by_status() {
-    periodsHolder.setPeriods();
+    periodsHolder.setPeriod();
 
     // bottom-up traversal -> from files to project
     underTest.beforeComponent(FILE1);
@@ -186,7 +186,7 @@ public class IssueCounterTest {
 
   @Test
   public void count_issues_by_resolution() {
-    periodsHolder.setPeriods();
+    periodsHolder.setPeriod();
 
     // bottom-up traversal -> from files to project
     underTest.beforeComponent(FILE1);
@@ -224,7 +224,7 @@ public class IssueCounterTest {
 
   @Test
   public void count_unresolved_issues_by_severity() {
-    periodsHolder.setPeriods();
+    periodsHolder.setPeriod();
 
     // bottom-up traversal -> from files to project
     underTest.beforeComponent(FILE1);
@@ -256,7 +256,7 @@ public class IssueCounterTest {
 
   @Test
   public void count_unresolved_issues_by_type() {
-    periodsHolder.setPeriods();
+    periodsHolder.setPeriod();
 
     // bottom-up traversal -> from files to project
     // file1 : one open code smell, one closed code smell (which will be excluded from metric)
@@ -289,7 +289,7 @@ public class IssueCounterTest {
   @Test
   public void count_new_issues() {
     Period period = newPeriod(3, 1500000000000L);
-    periodsHolder.setPeriods(period);
+    periodsHolder.setPeriod(period);
 
     underTest.beforeComponent(FILE1);
     // created before -> existing issues (so ignored)

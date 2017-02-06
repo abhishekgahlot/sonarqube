@@ -80,7 +80,7 @@ public class NewEffortAggregatorTest {
 
   @Test
   public void sum_new_maintainability_effort_of_issues() {
-    periodsHolder.setPeriods(PERIOD);
+    periodsHolder.setPeriod(PERIOD);
     DefaultIssue unresolved1 = newCodeSmellIssue(10L);
     DefaultIssue unresolved2 = newCodeSmellIssue(30L);
     DefaultIssue unresolvedWithoutDebt = newCodeSmellIssueWithoutEffort();
@@ -102,7 +102,7 @@ public class NewEffortAggregatorTest {
 
   @Test
   public void new_maintainability_effort_is_only_computed_using_code_smell_issues() {
-    periodsHolder.setPeriods(PERIOD);
+    periodsHolder.setPeriod(PERIOD);
     DefaultIssue codeSmellIssue = newCodeSmellIssue(10);
     // Issues of type BUG and VULNERABILITY should be ignored
     DefaultIssue bugIssue = newBugIssue(15);
@@ -124,7 +124,7 @@ public class NewEffortAggregatorTest {
 
   @Test
   public void sum_new_reliability_effort_of_issues() {
-    periodsHolder.setPeriods(PERIOD);
+    periodsHolder.setPeriod(PERIOD);
     DefaultIssue unresolved1 = newBugIssue(10L);
     DefaultIssue unresolved2 = newBugIssue(30L);
     DefaultIssue unresolvedWithoutDebt = newBugIssueWithoutEffort();
@@ -146,7 +146,7 @@ public class NewEffortAggregatorTest {
 
   @Test
   public void new_reliability_effort_is_only_computed_using_bug_issues() {
-    periodsHolder.setPeriods(PERIOD);
+    periodsHolder.setPeriod(PERIOD);
     DefaultIssue bugIssue = newBugIssue(15);
     // Issues of type CODE SMELL and VULNERABILITY should be ignored
     DefaultIssue codeSmellIssue = newCodeSmellIssue(10);
@@ -168,7 +168,7 @@ public class NewEffortAggregatorTest {
 
   @Test
   public void sum_new_securtiy_effort_of_issues() {
-    periodsHolder.setPeriods(PERIOD);
+    periodsHolder.setPeriod(PERIOD);
     DefaultIssue unresolved1 = newVulnerabilityIssue(10L);
     DefaultIssue unresolved2 = newVulnerabilityIssue(30L);
     DefaultIssue unresolvedWithoutDebt = newVulnerabilityIssueWithoutEffort();
@@ -190,7 +190,7 @@ public class NewEffortAggregatorTest {
 
   @Test
   public void new_security_effort_is_only_computed_using_vulnerability_issues() {
-    periodsHolder.setPeriods(PERIOD);
+    periodsHolder.setPeriod(PERIOD);
     DefaultIssue vulnerabilityIssue = newVulnerabilityIssue(12);
     // Issues of type CODE SMELL and BUG should be ignored
     DefaultIssue codeSmellIssue = newCodeSmellIssue(10);
@@ -212,7 +212,7 @@ public class NewEffortAggregatorTest {
 
   @Test
   public void aggregate_new_characteristic_measures_of_children() {
-    periodsHolder.setPeriods(PERIOD);
+    periodsHolder.setPeriod(PERIOD);
 
     DefaultIssue codeSmellIssue = newCodeSmellIssue(10);
     when(calculator.calculate(same(codeSmellIssue), anyList(), same(PERIOD))).thenReturn(4L);
@@ -246,7 +246,7 @@ public class NewEffortAggregatorTest {
 
   @Test
   public void no_measures_if_no_periods() {
-    periodsHolder.setPeriods();
+    periodsHolder.setPeriod();
     DefaultIssue unresolved = new DefaultIssue().setEffort(Duration.create(10));
     verifyZeroInteractions(calculator);
 

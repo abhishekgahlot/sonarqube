@@ -27,7 +27,7 @@ import org.sonar.api.measures.CoreMetrics;
 import org.sonar.core.issue.DefaultIssue;
 import org.sonar.server.computation.task.projectanalysis.component.Component;
 import org.sonar.server.computation.task.projectanalysis.component.PathAwareVisitorAdapter;
-import org.sonar.server.computation.task.projectanalysis.formula.counter.RatingVariationValue;
+import org.sonar.server.computation.task.projectanalysis.formula.counter.RatingCounter;
 import org.sonar.server.computation.task.projectanalysis.issue.ComponentIssuesRepository;
 import org.sonar.server.computation.task.projectanalysis.measure.MeasureRepository;
 import org.sonar.server.computation.task.projectanalysis.metric.Metric;
@@ -127,7 +127,7 @@ public class NewReliabilityAndSecurityRatingMeasuresVisitor extends PathAwareVis
   }
 
   private void initRatingsToA(Path<Counter> path) {
-    periodsHolder.getPeriods().forEach(period -> path.current().newRatingValueByMetric.values()
+    periodsHolder.getPeriod().forEach(period -> path.current().newRatingValueByMetric.values()
       .forEach(entry -> entry.increment(period, A)));
   }
 
@@ -136,7 +136,7 @@ public class NewReliabilityAndSecurityRatingMeasuresVisitor extends PathAwareVis
       .stream()
       .filter(issue -> issue.resolution() == null)
       .filter(issue -> issue.type().equals(BUG) || issue.type().equals(VULNERABILITY))
-      .forEach(issue -> periodsHolder.getPeriods().forEach(period -> path.current().processIssue(issue, period)));
+      .forEach(issue -> periodsHolder.getPeriod().forEach(period -> path.current().processIssue(issue, period)));
   }
 
   private static void addToParent(Path<Counter> path) {
@@ -146,9 +146,9 @@ public class NewReliabilityAndSecurityRatingMeasuresVisitor extends PathAwareVis
   }
 
   static final class Counter {
-    private Map<String, RatingVariationValue.Array> newRatingValueByMetric = ImmutableMap.of(
-      NEW_RELIABILITY_RATING_KEY, new RatingVariationValue.Array(),
-      NEW_SECURITY_RATING_KEY, new RatingVariationValue.Array());
+    private Map<String, RatingCounter.Array> newRatingValueByMetric = ImmutableMap.of(
+      NEW_RELIABILITY_RATING_KEY, new RatingCounter.Array(),
+      NEW_SECURITY_RATING_KEY, new RatingCounter.Array());
 
     private Counter() {
       // prevents instantiation

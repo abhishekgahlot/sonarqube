@@ -206,8 +206,9 @@ public class FormulaExecutorComponentVisitor extends PathAwareVisitorAdapter<For
     }
 
     @Override
-    public List<Period> getPeriods() {
-      return periodsHolder.getPeriods();
+    @CheckForNull
+    public Period getPeriod() {
+      return periodsHolder.hasPeriod() ? periodsHolder.getPeriod() : null;
     }
   }
 
@@ -252,8 +253,9 @@ public class FormulaExecutorComponentVisitor extends PathAwareVisitorAdapter<For
     }
 
     @Override
-    public List<Period> getPeriods() {
-      return periodsHolder.getPeriods();
+    @CheckForNull
+    public Period getPeriod() {
+      return periodsHolder.hasPeriod() ? periodsHolder.getPeriod() : null;
     }
   }
 }

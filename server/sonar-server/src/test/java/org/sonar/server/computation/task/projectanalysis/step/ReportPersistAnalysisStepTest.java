@@ -89,7 +89,7 @@ public class ReportPersistAnalysisStepTest extends BaseStepTest {
     underTest = new PersistAnalysisStep(system2, dbClient, treeRootHolder, analysisMetadataHolder, periodsHolder);
 
     // initialize PeriodHolder to empty by default
-    periodsHolder.setPeriods();
+    periodsHolder.setPeriod();
   }
 
   @Override
@@ -147,7 +147,7 @@ public class ReportPersistAnalysisStepTest extends BaseStepTest {
     SnapshotDto snapshotDto = SnapshotTesting.newAnalysis(projectDto).setCreatedAt(DateUtils.parseDateQuietly("2015-01-01").getTime());
     dbClient.snapshotDao().insert(dbTester.getSession(), snapshotDto);
     dbTester.getSession().commit();
-    periodsHolder.setPeriods(new Period(1, TIMEMACHINE_MODE_DATE, "2015-01-01", analysisDate, "u1"));
+    periodsHolder.setPeriod(new Period(1, TIMEMACHINE_MODE_DATE, "2015-01-01", analysisDate, "u1"));
 
     Component project = ReportComponent.builder(Component.Type.PROJECT, 1).setUuid("ABCD").setKey(PROJECT_KEY).build();
     treeRootHolder.setRoot(project);
@@ -163,7 +163,7 @@ public class ReportPersistAnalysisStepTest extends BaseStepTest {
 
   @Test
   public void only_persist_snapshots_with_leak_period_on_project_and_module() {
-    periodsHolder.setPeriods(new Period(1, TIMEMACHINE_MODE_PREVIOUS_ANALYSIS, null, analysisDate, "u1"));
+    periodsHolder.setPeriod(new Period(1, TIMEMACHINE_MODE_PREVIOUS_ANALYSIS, null, analysisDate, "u1"));
 
     OrganizationDto organizationDto = dbTester.organizations().insert();
     ComponentDto projectDto = ComponentTesting.newProjectDto(organizationDto, "ABCD").setKey(PROJECT_KEY).setName("Project");

@@ -114,17 +114,13 @@ public class CoverageUtilsTest {
 
   @Test
   public void getLongVariation_returns_0_if_MeasureVariation_has_none_for_the_specified_period() {
-    MeasureVariations variations = new MeasureVariations(null, 2d, null, null, 5d);
+    MeasureVariations variations = new MeasureVariations(null);
 
-    assertThat(getLongVariation(variations, createPeriod(1))).isEqualTo(0L);
-    assertThat(getLongVariation(variations, createPeriod(2))).isEqualTo(2L);
-    assertThat(getLongVariation(variations, createPeriod(3))).isEqualTo(0L);
-    assertThat(getLongVariation(variations, createPeriod(4))).isEqualTo(0L);
-    assertThat(getLongVariation(variations, createPeriod(5))).isEqualTo(5L);
+    assertThat(getLongVariation(variations, createPeriod())).isEqualTo(0L);
   }
 
-  private Period createPeriod(int periodIndex) {
-    return new Period(periodIndex, "mode" + periodIndex, null, 963L + periodIndex, String.valueOf(9865L + periodIndex));
+  private Period createPeriod() {
+    return new Period("mode1", null, 961L, String.valueOf(9866L));
   }
 
   private static class CounterInitializationContextRule extends ExternalResource implements CounterInitializationContext {

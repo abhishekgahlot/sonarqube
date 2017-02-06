@@ -28,7 +28,7 @@ import org.sonar.server.computation.task.projectanalysis.component.Component;
 import org.sonar.server.computation.task.projectanalysis.component.PathAwareCrawler;
 import org.sonar.server.computation.task.projectanalysis.component.ReportComponent;
 import org.sonar.server.computation.task.projectanalysis.component.TreeRootHolderRule;
-import org.sonar.server.computation.task.projectanalysis.formula.counter.IntVariationValue;
+import org.sonar.server.computation.task.projectanalysis.formula.counter.IntCounter;
 import org.sonar.server.computation.task.projectanalysis.measure.Measure;
 import org.sonar.server.computation.task.projectanalysis.measure.MeasureRepositoryRule;
 import org.sonar.server.computation.task.projectanalysis.measure.MeasureVariations;
@@ -91,7 +91,7 @@ public class ReportFormulaExecutorComponentVisitorTest {
   public MeasureRepositoryRule measureRepository = MeasureRepositoryRule.create(treeRootHolder, metricRepository);
   @Rule
   public PeriodsHolderRule periodsHolder = new PeriodsHolderRule()
-    .setPeriods(new Period(2, "some mode", null, 95l, "756l"), new Period(5, "some other mode", null, 756L, "956L"));
+    .setPeriod(new Period(2, "some mode", null, 95l, "756l"), new Period(5, "some other mode", null, 756L, "956L"));
 
   @Test
   public void verify_aggregation_on_value() throws Exception {
@@ -242,7 +242,7 @@ public class ReportFormulaExecutorComponentVisitorTest {
     @Override
     public Optional<Measure> createMeasure(FakeCounter counter, CreateMeasureContext context) {
       // verify the context which is passed to the method
-      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriods());
+      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriod());
       assertThat(context.getComponent()).isNotNull();
       assertThat(context.getMetric()).isSameAs(metricRepository.getByKey(NCLOC_KEY));
 
@@ -265,7 +265,7 @@ public class ReportFormulaExecutorComponentVisitorTest {
     @Override
     public Optional<Measure> createMeasure(FakeCounter counter, CreateMeasureContext context) {
       // verify the context which is passed to the method
-      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriods());
+      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriod());
       assertThat(context.getComponent()).isNotNull();
       assertThat(context.getMetric())
         .isIn(metricRepository.getByKey(NEW_LINES_TO_COVER_KEY), metricRepository.getByKey(NEW_COVERAGE_KEY));
@@ -301,7 +301,7 @@ public class ReportFormulaExecutorComponentVisitorTest {
     public void initialize(CounterInitializationContext context) {
       // verify the context which is passed to the method
       assertThat(context.getLeaf().getChildren()).isEmpty();
-      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriods());
+      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriod());
 
       Optional<Measure> measureOptional = context.getMeasure(LINES_KEY);
       if (measureOptional.isPresent()) {
@@ -320,7 +320,7 @@ public class ReportFormulaExecutorComponentVisitorTest {
     @Override
     public Optional<Measure> createMeasure(FakeVariationCounter counter, CreateMeasureContext context) {
       // verify the context which is passed to the method
-      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriods());
+      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriod());
       assertThat(context.getComponent()).isNotNull();
       assertThat(context.getMetric()).isSameAs(metricRepository.getByKey(NEW_COVERAGE_KEY));
 
@@ -341,7 +341,7 @@ public class ReportFormulaExecutorComponentVisitorTest {
   }
 
   private class FakeVariationCounter implements Counter<FakeVariationCounter> {
-    private final IntVariationValue.Array values = IntVariationValue.newArray();
+    private final IntCounter.Array values = IntCounter.newArray();
 
     @Override
     public void aggregate(FakeVariationCounter counter) {
@@ -352,7 +352,7 @@ public class ReportFormulaExecutorComponentVisitorTest {
     public void initialize(CounterInitializationContext context) {
       // verify the context which is passed to the method
       assertThat(context.getLeaf().getChildren()).isEmpty();
-      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriods());
+      assertThat(context.getPeriods()).isEqualTo(periodsHolder.getPeriod());
 
       Optional<Measure> measureOptional = context.getMeasure(NEW_LINES_TO_COVER_KEY);
       if (!measureOptional.isPresent()) {

@@ -117,7 +117,7 @@ public class NewMaintainabilityMeasuresVisitorTest {
 
   @Test
   public void project_has_no_measure_if_there_is_no_period() {
-    periodsHolder.setPeriods();
+    periodsHolder.setPeriod();
     treeRootHolder.setRoot(builder(PROJECT, ROOT_REF).build());
 
     underTest.visit(treeRootHolder.getRoot());
@@ -128,7 +128,7 @@ public class NewMaintainabilityMeasuresVisitorTest {
 
   @Test
   public void file_has_no_new_debt_ratio_variation_if_there_is_no_period() {
-    periodsHolder.setPeriods();
+    periodsHolder.setPeriod();
     when(ratingSettings.getDevCost(LANGUAGE_1_KEY)).thenReturn(LANGUAGE_1_DEV_COST);
     setupOneFileAloneInAProject(50, 12, Flag.SRC_FILE, Flag.WITH_NCLOC, Flag.WITH_CHANGESET);
     measureRepository.addRawMeasure(ROOT_REF, NEW_TECHNICAL_DEBT_KEY, createNewDebtMeasure(50, 12));
@@ -329,7 +329,7 @@ public class NewMaintainabilityMeasuresVisitorTest {
     long period4 = 40000L;
     long period5 = 50000L;
 
-    periodsHolder.setPeriods(
+    periodsHolder.setPeriod(
       new Period(1, SOME_PERIOD_MODE, null, period1, SOME_ANALYSIS_UUID),
       new Period(2, SOME_PERIOD_MODE, null, period2, SOME_ANALYSIS_UUID),
       new Period(3, SOME_PERIOD_MODE, null, period3, SOME_ANALYSIS_UUID),
@@ -528,7 +528,7 @@ public class NewMaintainabilityMeasuresVisitorTest {
       .isAbsent();  }
 
   private void setTwoPeriods() {
-    periodsHolder.setPeriods(
+    periodsHolder.setPeriod(
       new Period(2, SOME_PERIOD_MODE, null, PERIOD_2_SNAPSHOT_DATE, SOME_ANALYSIS_UUID),
       new Period(4, SOME_PERIOD_MODE, null, PERIOD_5_SNAPSHOT_DATE, SOME_ANALYSIS_UUID));
   }

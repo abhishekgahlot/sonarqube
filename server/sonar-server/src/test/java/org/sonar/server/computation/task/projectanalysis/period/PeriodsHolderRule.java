@@ -19,8 +19,6 @@
  */
 package org.sonar.server.computation.task.projectanalysis.period;
 
-import java.util.Arrays;
-import java.util.List;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -46,24 +44,20 @@ public class PeriodsHolderRule implements TestRule, PeriodsHolder {
     this.delegate = new PeriodsHolderImpl();
   }
 
-  public PeriodsHolderRule setPeriods(Period... periods) {
+  public PeriodsHolderRule setPeriod(Period period) {
     delegate = new PeriodsHolderImpl();
-    delegate.setPeriods(Arrays.asList(periods));
+    delegate.setPeriod(period);
     return this;
   }
 
   @Override
-  public List<Period> getPeriods() {
-    return delegate.getPeriods();
+  public Period getPeriod() {
+    return delegate.getPeriod();
   }
 
   @Override
-  public boolean hasPeriod(int i) {
-    return delegate.hasPeriod(i);
+  public boolean hasPeriod() {
+    return delegate.hasPeriod();
   }
 
-  @Override
-  public Period getPeriod(int i) {
-    return delegate.getPeriod(i);
-  }
 }

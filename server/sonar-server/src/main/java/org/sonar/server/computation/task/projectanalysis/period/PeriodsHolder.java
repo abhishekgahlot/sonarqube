@@ -19,25 +19,21 @@
  */
 package org.sonar.server.computation.task.projectanalysis.period;
 
-import java.util.List;
-
 /**
- * Repository of periods used to compute differential measures.
+ * Repository of the leak period used to compute differential measures.
  * Here are the steps to retrieve these periods :
- * - Read the 5 period properties ${@link org.sonar.core.config.CorePropertyDefinitions#TIMEMACHINE_PERIOD_PREFIX}
- * - Try to find the matching snapshots from the properties
- * - If a snapshot is found, a new period is added to the repository
+ * - Read the period property ${@link org.sonar.core.config.CorePropertyDefinitions#TIMEMACHINE_PERIOD_PREFIX}
+ * - Try to find the matching snapshots from the property
+ * - If a snapshot is found, the period is set to the repository
  */
 public interface PeriodsHolder {
 
-  int MAX_NUMBER_OF_PERIODS = 5;
-
   /**
-   * Return the list of differential periods, ordered by increasing index.
+   * Return the leak period
    *
-   * @throws IllegalStateException if the periods haven't been initialized
+   * @throws IllegalStateException if the period haven't been initialized
    */
-  List<Period> getPeriods();
+  Period getPeriod();
 
   /**
    * Finds out whether the holder contains a Period for the specified index.
@@ -45,15 +41,6 @@ public interface PeriodsHolder {
    * @throws IllegalStateException if the periods haven't been initialized
    * @throws IndexOutOfBoundsException if i is either &lt; 1 or &gt; 5
    */
-  boolean hasPeriod(int i);
-
-  /**
-   * Retrieves the Period for the specified index from the Holder.
-   *
-   * @throws IllegalStateException if the periods haven't been initialized
-   * @throws IllegalStateException if there is no period for the specified index (see {@link #hasPeriod(int)})
-   * @throws IndexOutOfBoundsException if i is either &lt; 1 or &gt; 5
-   */
-  Period getPeriod(int i);
+  boolean hasPeriod();
 
 }

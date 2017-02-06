@@ -48,6 +48,6 @@ public class DumbCreateMeasureContext implements CreateMeasureContext {
 
   @Override
   public List<Period> getPeriods() {
-    return periodsHolder.getPeriods();
+    return periodsHolder.getPeriod();
   }
 }

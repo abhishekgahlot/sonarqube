@@ -136,7 +136,7 @@ public class IssueCounter extends IssueVisitor {
   @Override
   public void onIssue(Component component, DefaultIssue issue) {
     currentCounters.add(issue);
-    for (Period period : periodsHolder.getPeriods()) {
+    for (Period period : periodsHolder.getPeriod()) {
       // Add one second to not take into account issues created during current analysis
       if (issue.creationDate().getTime() >= period.getSnapshotDate() + 1000L) {
         currentCounters.addOnPeriod(issue, period.getIndex());
@@ -182,9 +182,9 @@ public class IssueCounter extends IssueVisitor {
   }
 
   private void addMeasuresByPeriod(Component component) {
-    if (!periodsHolder.getPeriods().isEmpty()) {
+    if (!periodsHolder.getPeriod().isEmpty()) {
       Double[] unresolvedVariations = new Double[PeriodsHolder.MAX_NUMBER_OF_PERIODS];
-      for (Period period : periodsHolder.getPeriods()) {
+      for (Period period : periodsHolder.getPeriod()) {
         unresolvedVariations[period.getIndex() - 1] = (double) currentCounters.counterForPeriod(period.getIndex()).unresolved;
       }
       measureRepository.add(component, metricRepository.getByKey(NEW_VIOLATIONS_KEY), Measure.newMeasureBuilder()
@@ -195,7 +195,7 @@ public class IssueCounter extends IssueVisitor {
         String severity = entry.getKey();
         String metricKey = entry.getValue();
         Double[] variations = new Double[PeriodsHolder.MAX_NUMBER_OF_PERIODS];
-        for (Period period : periodsHolder.getPeriods()) {
+        for (Period period : periodsHolder.getPeriod()) {
           Multiset<String> bag = currentCounters.counterForPeriod(period.getIndex()).severityBag;
           variations[period.getIndex() - 1] = (double) bag.count(severity);
         }
@@ -211,7 +211,7 @@ public class IssueCounter extends IssueVisitor {
         RuleType type = entry.getKey();
         String metricKey = entry.getValue();
         Double[] variations = new Double[PeriodsHolder.MAX_NUMBER_OF_PERIODS];
-        for (Period period : periodsHolder.getPeriods()) {
+        for (Period period : periodsHolder.getPeriod()) {
           Multiset<RuleType> bag = currentCounters.counterForPeriod(period.getIndex()).typeBag;
           variations[period.getIndex() - 1] = (double) bag.count(type);
         }

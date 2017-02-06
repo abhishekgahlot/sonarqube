@@ -23,59 +23,59 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class LongVariationValueTest {
+public class LongCounterTest {
   @Test
   public void newly_created_LongVariationValue_is_unset_and_has_value_0() {
-    verifyUnsetVariationValue(new LongVariationValue());
+    verifyUnsetVariationValue(new LongCounter());
   }
 
   @Test
   public void increment_long_sets_LongVariationValue_and_increments_value() {
-    verifySetVariationValue(new LongVariationValue().increment(10L), 10L);
+    verifySetVariationValue(new LongCounter().increment(10L), 10L);
   }
 
   @Test
   public void increment_LongVariationValue_has_no_effect_if_arg_is_null() {
-    verifyUnsetVariationValue(new LongVariationValue().increment(null));
+    verifyUnsetVariationValue(new LongCounter().increment(null));
   }
 
   @Test
   public void increment_LongVariationValue_has_no_effect_if_arg_is_unset() {
-    verifyUnsetVariationValue(new LongVariationValue().increment(new LongVariationValue()));
+    verifyUnsetVariationValue(new LongCounter().increment(new LongCounter()));
   }
 
   @Test
   public void increment_LongVariationValue_increments_by_the_value_of_the_arg() {
-    LongVariationValue source = new LongVariationValue().increment(10L);
-    LongVariationValue target = new LongVariationValue().increment(source);
+    LongCounter source = new LongCounter().increment(10L);
+    LongCounter target = new LongCounter().increment(source);
 
     verifySetVariationValue(target, 10L);
   }
 
   @Test
   public void multiple_calls_to_increment_LongVariationValue_increments_by_the_value_of_the_arg() {
-    LongVariationValue target = new LongVariationValue()
-      .increment(new LongVariationValue().increment(35L))
-      .increment(new LongVariationValue().increment(10L));
+    LongCounter target = new LongCounter()
+      .increment(new LongCounter().increment(35L))
+      .increment(new LongCounter().increment(10L));
 
     verifySetVariationValue(target, 45L);
   }
 
   @Test
   public void multiples_calls_to_increment_long_increment_the_value() {
-    LongVariationValue variationValue = new LongVariationValue()
+    LongCounter variationValue = new LongCounter()
       .increment(10L)
       .increment(95L);
 
     verifySetVariationValue(variationValue, 105L);
   }
 
-  private static void verifyUnsetVariationValue(LongVariationValue variationValue) {
+  private static void verifyUnsetVariationValue(LongCounter variationValue) {
     assertThat(variationValue.isSet()).isFalse();
     assertThat(variationValue.getValue()).isEqualTo(0L);
   }
 
-  private static void verifySetVariationValue(LongVariationValue variationValue, long expected) {
+  private static void verifySetVariationValue(LongCounter variationValue, long expected) {
     assertThat(variationValue.isSet()).isTrue();
     assertThat(variationValue.getValue()).isEqualTo(expected);
   }

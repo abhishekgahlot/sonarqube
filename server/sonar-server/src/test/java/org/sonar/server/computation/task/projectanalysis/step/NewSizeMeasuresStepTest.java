@@ -95,7 +95,7 @@ public class NewSizeMeasuresStepTest {
         .build());
 
   @Rule
-  public PeriodsHolderRule periodsHolder = new PeriodsHolderRule().setPeriods(
+  public PeriodsHolderRule periodsHolder = new PeriodsHolderRule().setPeriod(
     new Period(2, "mode_p_1", null, parseDate("2009-12-25").getTime(), "u1"),
     new Period(5, "mode_p_5", null, parseDate("2011-02-18").getTime(), "u2"));
 

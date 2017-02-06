@@ -94,9 +94,9 @@ public class NewEffortAggregator extends IssueVisitor {
 
   @Override
   public void onIssue(Component component, DefaultIssue issue) {
-    if (issue.resolution() == null && issue.effortInMinutes() != null && !periodsHolder.getPeriods().isEmpty()) {
+    if (issue.resolution() == null && issue.effortInMinutes() != null && !periodsHolder.getPeriod().isEmpty()) {
       List<IssueChangeDto> changelog = changesByIssueUuid.get(issue.key());
-      for (Period period : periodsHolder.getPeriods()) {
+      for (Period period : periodsHolder.getPeriod()) {
         counter.add(issue, period, changelog);
       }
     }

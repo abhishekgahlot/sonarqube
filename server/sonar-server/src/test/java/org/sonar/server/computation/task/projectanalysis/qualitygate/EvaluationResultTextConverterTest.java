@@ -134,7 +134,7 @@ public class EvaluationResultTextConverterTest {
 
     Date date = new Date();
     Period period = new Period(periodIndex, SOME_MODE, null, date.getTime(), SOME_ANALYSIS_UUID);
-    periodsHolder.setPeriods(period);
+    periodsHolder.setPeriod(period);
     when(periods.label(period.getMode(), period.getModeParameter(), date)).thenReturn(periodLabel);
 
     Condition condition = new Condition(SOME_VARIATION_METRIC, operator.getDbValue(), ERROR_THRESHOLD, WARNING_THRESHOLD, periodIndex);
@@ -157,7 +157,7 @@ public class EvaluationResultTextConverterTest {
 
     Date date = new Date();
     Period period = new Period(periodIndex, SOME_MODE, null, date.getTime(), SOME_ANALYSIS_UUID);
-    periodsHolder.setPeriods(period);
+    periodsHolder.setPeriod(period);
     when(periods.label(period.getMode(), period.getModeParameter(), date)).thenReturn(periodLabel);
 
     Condition condition = new Condition(INT_METRIC, operator.getDbValue(), ERROR_THRESHOLD, WARNING_THRESHOLD, periodIndex);

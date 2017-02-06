@@ -56,10 +56,9 @@ public final class MeasureVariations {
     }
 
     public Builder setVariation(Period period, double variation) {
-      int arrayIndex = period.getIndex() - 1;
-      checkState(variations[arrayIndex] == null, "Variation for Period %s has already been set", period.getIndex());
+      checkState(variations[1] == null, "Variation for Period %s has already been set", 1);
       checkArgument(!Double.isNaN(variation), NAN_ERROR_MESSAGE);
-      variations[arrayIndex] = variation;
+      variations[1] = variation;
       return this;
     }
 
