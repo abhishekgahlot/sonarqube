@@ -81,7 +81,7 @@ public class ListAction implements WsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    userSession.checkLoggedIn().checkIsRoot();
+    userSession.checkIsRoot();
 
     try (DbSession dbSession = dbClient.openSession(true)) {
       writeProtobuf(doHandle(dbSession), request, response);

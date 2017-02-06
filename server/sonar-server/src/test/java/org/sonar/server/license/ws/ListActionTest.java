@@ -38,7 +38,6 @@ import org.sonar.db.DbClient;
 import org.sonar.db.DbTester;
 import org.sonar.db.property.PropertyDbTester;
 import org.sonar.server.exceptions.ForbiddenException;
-import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.setting.ws.SettingsFinder;
 import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.ws.TestRequest;
@@ -262,15 +261,6 @@ public class ListActionTest {
     userSession.logIn().setNonRoot();
 
     expectedException.expect(ForbiddenException.class);
-
-    executeRequest();
-  }
-
-  @Test
-  public void throw_UnauthorizedException_if_not_logged_in() throws Exception {
-    userSession.anonymous();
-
-    expectedException.expect(UnauthorizedException.class);
 
     executeRequest();
   }
