@@ -255,12 +255,57 @@ public class CreateActionTest {
     db.rootFlag().verify("doh", true);
   }
 
-  private void unsetDefaultGroupProperty() {
-    settings.setProperty("sonar.defaultGroup", (String) null);
+  @Test
+  public void fail_when_missing_login() throws Exception {
+    logInAsRoot();
+
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage("Login is mandatory and must not be empty");
+    call(CreateRequest.builder()
+      .setLogin(null)
+      .setName("John")
+      .setPassword("1234")
+      .build());
   }
 
-  private void setDefaultGroupProperty(GroupDto adminGroup) {
-    settings.setProperty("sonar.defaultGroup", adminGroup.getName());
+  @Test
+  public void fail_when_missing_name() throws Exception {
+    logInAsRoot();
+
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage("Name is mandatory and must not be empty");
+    call(CreateRequest.builder()
+      .setLogin("john")
+      .setName(null)
+      .setPassword("1234")
+      .build());
+  }
+
+  @Test
+  public void fail_when_missing_password() throws Exception {
+    logInAsRoot();
+
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage("Password is mandatory and must not be empty");
+    call(CreateRequest.builder()
+      .setLogin("john")
+      .setName("John")
+      .setPassword(null)
+      .build());
+  }
+
+  @Test
+  public void fail_when_password_is_set_on_none_local_user() throws Exception {
+    logInAsRoot();
+
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage("Password should only be set on local user");
+    call(CreateRequest.builder()
+      .setLogin("john")
+      .setName("John")
+      .setPassword("1234")
+      .setLocal(false)
+      .build());
   }
 
   @Test
@@ -272,6 +317,14 @@ public class CreateActionTest {
 
     expectedException.expect(ForbiddenException.class);
     executeRequest("john");
+  }
+
+  private void unsetDefaultGroupProperty() {
+    settings.setProperty("sonar.defaultGroup", (String) null);
+  }
+
+  private void setDefaultGroupProperty(GroupDto adminGroup) {
+    settings.setProperty("sonar.defaultGroup", adminGroup.getName());
   }
 
   private CreateWsResponse executeRequest(String login) throws Exception {
