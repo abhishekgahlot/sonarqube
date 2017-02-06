@@ -42,7 +42,6 @@ import org.sonar.db.component.SnapshotTesting;
 import org.sonar.db.event.EventDto;
 import org.sonar.server.exceptions.ForbiddenException;
 import org.sonar.server.exceptions.NotFoundException;
-import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.ws.TestRequest;
 import org.sonar.server.ws.WsActionTester;
@@ -346,22 +345,6 @@ public class CreateEventActionTest {
     expectedException.expectMessage("Insufficient privileges");
 
     call(request);
-  }
-
-  @Test
-  public void throw_UnauthorizedException_if_not_logged_in() {
-    SnapshotDto analysis = db.components().insertProjectAndSnapshot(newProjectDto(db.organizations().insert(), "P1"));
-    CreateEventRequest.Builder request = CreateEventRequest.builder()
-      .setAnalysis(analysis.getUuid())
-      .setCategory(VERSION)
-      .setName("5.6.3");
-    userSession.anonymous();
-
-    expectedException.expect(UnauthorizedException.class);
-    expectedException.expectMessage("Authentication is required");
-
-    call(request);
-
   }
 
   @Test
