@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
+import org.sonar.api.utils.DateUtils;
 import org.sonar.api.utils.System2;
 import org.sonar.core.util.stream.Collectors;
 import org.sonar.db.DbClient;
@@ -82,9 +83,7 @@ public class TaskFormatter {
     builder.setLogs(false);
     setNullable(dto.getSubmitterLogin(), builder::setSubmitterLogin);
     builder.setSubmittedAt(formatDateTime(new Date(dto.getCreatedAt())));
-    if (dto.getStartedAt() != null) {
-      builder.setStartedAt(formatDateTime(new Date(dto.getStartedAt())));
-    }
+    setNullable(dto.getStartedAt(), builder::setStartedAt, DateUtils::formatDateTime);
     setNullable(computeExecutionTimeMs(dto), builder::setExecutionTimeMs);
     return builder.build();
   }
@@ -120,12 +119,8 @@ public class TaskFormatter {
     setNullable(dto.getAnalysisUuid(), builder::setAnalysisId);
     setNullable(dto.getSubmitterLogin(), builder::setSubmitterLogin);
     builder.setSubmittedAt(formatDateTime(new Date(dto.getSubmittedAt())));
-    if (dto.getStartedAt() != null) {
-      builder.setStartedAt(formatDateTime(new Date(dto.getStartedAt())));
-    }
-    if (dto.getExecutedAt() != null) {
-      builder.setExecutedAt(formatDateTime(new Date(dto.getExecutedAt())));
-    }
+    setNullable(dto.getStartedAt(), builder::setStartedAt, DateUtils::formatDateTime);
+    setNullable(dto.getExecutedAt(), builder::setExecutedAt, DateUtils::formatDateTime);
     setNullable(dto.getExecutionTimeMs(), builder::setExecutionTimeMs);
     setNullable(dto.getErrorMessage(), builder::setErrorMessage);
     setNullable(dto.getErrorStacktrace(), builder::setErrorStacktrace);
