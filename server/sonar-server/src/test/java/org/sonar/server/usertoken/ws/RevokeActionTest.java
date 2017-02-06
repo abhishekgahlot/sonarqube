@@ -25,12 +25,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.sonar.api.utils.System2;
-import org.sonar.core.permission.GlobalPermissions;
 import org.sonar.db.DbClient;
 import org.sonar.db.DbSession;
 import org.sonar.db.DbTester;
 import org.sonar.db.user.UserTokenDto;
 import org.sonar.server.exceptions.ForbiddenException;
+import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.ws.TestRequest;
 import org.sonar.server.ws.WsActionTester;
@@ -80,7 +80,7 @@ public class RevokeActionTest {
 
   @Test
   public void user_can_delete_its_own_tokens() {
-    userSession.logIn(GRACE_HOPPER).setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+    userSession.logIn(GRACE_HOPPER);
     insertUserToken(newUserToken().setLogin(GRACE_HOPPER).setName("token-to-delete"));
 
     String response = newRequest(null, "token-to-delete");
@@ -98,10 +98,21 @@ public class RevokeActionTest {
   }
 
   @Test
-  public void fail_if_insufficient_privileges() {
-    userSession.logIn().setGlobalPermissions(GlobalPermissions.SCAN_EXECUTION);
+  public void throw_ForbiddenException_if_non_administrator_revokes_token_of_someone_else() {
+    userSession.logIn();
     insertUserToken(newUserToken().setLogin(GRACE_HOPPER).setName(TOKEN_NAME));
+
     expectedException.expect(ForbiddenException.class);
+
+    newRequest(GRACE_HOPPER, TOKEN_NAME);
+  }
+
+  @Test
+  public void throw_UnauthorizedException_if_not_logged_in() {
+    userSession.anonymous();
+    insertUserToken(newUserToken().setLogin(GRACE_HOPPER).setName(TOKEN_NAME));
+
+    expectedException.expect(UnauthorizedException.class);
 
     newRequest(GRACE_HOPPER, TOKEN_NAME);
   }
