@@ -66,7 +66,7 @@ public class CreateAction implements QualityGatesWsAction {
 
   @Override
   public void handle(Request request, Response response) {
-    userSession.checkLoggedIn().checkOrganizationPermission(defaultOrganizationProvider.get().getUuid(), GlobalPermissions.QUALITY_GATE_ADMIN);
+    userSession.checkOrganizationPermission(defaultOrganizationProvider.get().getUuid(), GlobalPermissions.QUALITY_GATE_ADMIN);
 
     try (DbSession dbSession = dbClient.openSession(false)) {
       QualityGateDto newQualityGate = qualityGateUpdater.create(dbSession, request.mandatoryParam(PARAM_NAME));
