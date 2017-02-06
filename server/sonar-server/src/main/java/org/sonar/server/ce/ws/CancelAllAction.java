@@ -47,7 +47,7 @@ public class CancelAllAction implements CeWsAction {
 
   @Override
   public void handle(Request wsRequest, Response wsResponse) {
-    userSession.checkLoggedIn().checkIsRoot();
+    userSession.checkIsRoot();
     queue.cancelAll();
     wsResponse.noContent();
   }
