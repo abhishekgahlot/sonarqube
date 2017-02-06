@@ -31,6 +31,7 @@ import org.sonar.db.DbTester;
 import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.ForbiddenException;
 import org.sonar.server.exceptions.ServerException;
+import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.usertoken.TokenGenerator;
 import org.sonar.server.ws.TestRequest;
@@ -152,9 +153,19 @@ public class GenerateActionTest {
   }
 
   @Test
-  public void fail_if_insufficient_privileges() {
+  public void throw_ForbiddenException_if_non_administrator_creates_token_for_someone_else() {
     userSession.logIn().setNonRoot();
+
     expectedException.expect(ForbiddenException.class);
+
+    newRequest(GRACE_HOPPER, TOKEN_NAME);
+  }
+
+  @Test
+  public void throw_UnauthorizedException_if_not_logged_in() {
+    userSession.anonymous();
+
+    expectedException.expect(UnauthorizedException.class);
 
     newRequest(GRACE_HOPPER, TOKEN_NAME);
   }
