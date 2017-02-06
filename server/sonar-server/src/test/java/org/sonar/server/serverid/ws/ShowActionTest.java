@@ -34,7 +34,6 @@ import org.sonar.db.DbClient;
 import org.sonar.db.DbTester;
 import org.sonar.db.property.PropertyDbTester;
 import org.sonar.server.exceptions.ForbiddenException;
-import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.platform.ServerIdGenerator;
 import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.ws.TestRequest;
@@ -144,16 +143,6 @@ public class ShowActionTest {
 
     expectedException.expect(ForbiddenException.class);
     expectedException.expectMessage("Insufficient privileges");
-
-    executeRequest();
-  }
-
-  @Test
-  public void throw_UnauthorizedException_if_not_logged_in() throws Exception {
-    userSession.anonymous();
-
-    expectedException.expect(UnauthorizedException.class);
-    expectedException.expectMessage("Authentication is required");
 
     executeRequest();
   }

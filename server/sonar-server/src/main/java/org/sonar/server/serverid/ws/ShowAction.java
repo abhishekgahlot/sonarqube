@@ -72,7 +72,7 @@ public class ShowAction implements ServerIdWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    userSession.checkLoggedIn().checkIsRoot();
+    userSession.checkIsRoot();
     try (DbSession dbSession = dbClient.openSession(true)) {
       Map<String, PropertyDto> properties = dbClient.propertiesDao().selectGlobalPropertiesByKeys(dbSession, SETTINGS_KEYS).stream()
         .collect(Collectors.uniqueIndex(PropertyDto::getKey, Function.identity()));
