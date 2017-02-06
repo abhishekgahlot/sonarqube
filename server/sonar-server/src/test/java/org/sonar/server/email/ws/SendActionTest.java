@@ -29,7 +29,6 @@ import org.sonar.api.server.ws.WebService;
 import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.ForbiddenException;
 import org.sonar.server.exceptions.Message;
-import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.notification.email.EmailNotificationChannel;
 import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.ws.TestRequest;
@@ -88,16 +87,6 @@ public class SendActionTest {
     expectedException.expect(IllegalArgumentException.class);
 
     executeRequest("john@doo.com", "Test Message from SonarQube", null);
-  }
-
-  @Test
-  public void throw_UnauthorizedException_if_not_logged_in() {
-    userSession.anonymous();
-
-    expectedException.expect(UnauthorizedException.class);
-    expectedException.expectMessage("Authentication is required");
-
-    ws.newRequest().execute();
   }
 
   @Test
