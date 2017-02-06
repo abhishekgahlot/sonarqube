@@ -93,6 +93,11 @@ public class IssueCreationDateTest extends AbstractIssueTest {
     server.associateProjectToQualityProfile(SAMPLE_1_PROJECT_KEY, "xoo", "with-custom-message");
 
     SonarScanner scanner = SonarScanner.create(projectDir(SAMPLE_1_DIRECTORY));
+
+    // FIXME debugging
+    scanner.setProperty("sonar.batch.keepReport", "true");
+    // scanner.addArgument("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005");
+
     scm.accept(scanner);
     ORCHESTRATOR.executeBuild(scanner);
 
