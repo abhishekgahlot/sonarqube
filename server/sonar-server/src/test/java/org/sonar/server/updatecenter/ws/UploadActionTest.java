@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.sonar.server.exceptions.ForbiddenException;
-import org.sonar.server.exceptions.UnauthorizedException;
 import org.sonar.server.platform.ServerFileSystem;
 import org.sonar.server.tester.UserSessionRule;
 import org.sonar.server.ws.TestResponse;
@@ -119,16 +118,6 @@ public class UploadActionTest {
     // As the same InputStream is used, it will fail as it should have been called during the first execution of the WS
     expectedException.expectCause(hasType(ClosedChannelException.class));
     call(inputStream, PLUGIN_NAME);
-  }
-
-  @Test
-  public void throw_UnauthorizedException_if_not_logged_in() throws Exception {
-    userSession.anonymous();
-
-    expectedException.expect(UnauthorizedException.class);
-    expectedException.expectMessage("Authentication is required");
-
-    call(newInputStream(plugin.toPath()), PLUGIN_NAME);
   }
 
   @Test

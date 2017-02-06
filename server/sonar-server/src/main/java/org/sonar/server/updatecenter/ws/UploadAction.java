@@ -62,7 +62,7 @@ public class UploadAction implements UpdateCenterWsAction {
 
   @Override
   public void handle(Request request, Response response) throws Exception {
-    userSession.checkLoggedIn().checkIsRoot();
+    userSession.checkIsRoot();
 
     Part part = request.mandatoryParamAsPart(PARAM_FILE);
     String fileName = part.getFileName();
